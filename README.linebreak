@@ -1,0 +1,254 @@
+unicode_linebreak - Uicode Line Breaking Module.
+
+Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
+redistributed under GNU General Public License version 2 (or later
+version you prefer).
+
+$Id$
+
+
+Integration to Your System
+==========================
+
+1. Prepare header file.
+
+A header file unicode.h is required, in which 'unicode_char' type
+should be defined.  unicode_char holds UCS-4 ordinal number of
+character.  For example:
+
+    typedef wchar_t unicode_char;
+
+2. Include a header.
+
+At top of source of your application, insert following line:
+
+    #include "unicode_linebreak.h"
+
+3. Link modules.
+
+Compile and link following source files to your application:
+
+    unicode_linebreak.c
+    unicode_linebreaktab.c
+
+
+API
+===
+
+1. Header
+
+#include "unicode_linebreak.h"
+
+2. Public functions
+
+struct unicode_lbinfo
+*unicode_lbinfo_alloc(unicode_char *text, size_t textlen,
+                      unicode_lbprop_funcptr
+                      (*find_lbprop_func)(const char *, int),
+                      int (*tailor_width)(unicode_char, int,
+                                          enum unicode_lbclass, int),
+                      enum unicode_lbclass
+                      (*tailor_lbclass)(unicode_char, int,
+                                        enum unicode_lbclass, int),
+                      const char *chset, int flags, void *voidarg);
+
+    Allocate line breaking informations for given unicode text.
+
+    Arguments:
+        text:
+                Text to be broken.
+        textlen:
+                Length of text.
+        find_lbprop_func:
+                Function to get a function that get character properties
+                of unicode character.  If NULL is specified, built-in
+                function will be used.                
+        tailor_width:
+                Function to tailor character width information. If NULL
+                is specified, built-in function will be used.
+        tailor_lbclass:
+                Function to tailor line breaking class. If NULL is 
+                specified, built-in function will be used.
+        chset:
+                Charset context.  This is fed to find_lbprop_func(), and
+                may referred through lbinfo argument fed to
+                is_line_exceeded() and writeout_cb().
+        flags:
+                Bitwise options to customize behavior of line breaking
+                (see unicode_linebreak.h).
+        voidarg:
+                A pointer to custom data structure passed to
+                is_line_exceeded() and writeout_cb() described below.
+                If you don't need custom data, set this NULL.
+
+    Returns:
+        Allocated structure unicode_lbinfo, line breaking informations
+        for text.  If text is NULL, length of text is zero, or error
+        occur, NULL will be returned.
+
+void unicode_lbinfo_free(struct unicode_lbinfo *lbinfo);
+
+    Free storage allocated by unicode_lbinfo_alloc().
+
+enum unicode_lbaction
+unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
+                     int (*is_line_exceeded)(struct unicode_lbinfo *,
+                                             unicode_char *,
+                                             off_t, size_t, int),
+                     void (*writeout_cb)(struct unicode_lbinfo *,
+                                         unicode_char *,
+                                         off_t, size_t, enum unicode_lbaction),
+                     int maxlen);
+
+    Execute line breaking algorithm.
+
+    Arguments:
+        lbinfo:
+                Line breaking informations.
+        text:
+                Array of unicode character to be broken.
+        is_line_exceeded:
+                Function to determin whether length of a text fragment
+                exceeds the limit specified by maxlen.  If NULL is
+                specified, built-in function will be used.
+        writeout_cb:
+                Callback function to write out each broken lines (see
+                below).  If NULL is specified, unicode_do_linebreak()
+                searches optimum line breaking point over text but
+                never output anything.
+        maxlen:
+                Limit of line length.
+
+    Returns:
+        UNICODE_LBACTION_NOMOD:
+                No breaks or only explicit break(s) have occured.
+        UNICODE_LBACTION_INDIRECT:
+                Indirect break(s) have occured, but no direct breaks.
+        UNICODE_LBACTION_DIRECT:
+                Direct break(s) have occured, and probablly Indirect
+                breaks also.
+
+    Callback function:
+        void (*writeout_cb)(struct unicode_lbinfo *, unicode_char *,
+                            off_t, size_t, enum unicode_lbaction);
+
+        Called by unicode_do_linebreak() when breaking point is
+        found then something to output exists.
+
+        Arguments:
+            lbinfo:
+                    Line breaking informations.
+            text:
+                    Array of unicode character.
+            start:
+                    Offset of text fragment on text to output.
+            size:
+                    Length of text fragment to output.
+
+        is_line_exceeded:
+                Function to determin whether length of a text fragment
+                exceeds limit specified by maxlen.  If NULL is specified,
+                built-in function will be used.
+        writeout_cb:
+                Callback function to write out each broken lines (see
+                below).  If NULL is specified, unicode_do_linebreak()
+                search optimum line breaking point over text but
+                never output anything.
+        maxlen:
+                Limit of line length.
+        action:
+                Type of line breaking behavior:
+                UNICODE_LBACTION_INDIRECT: Indirect break.
+                UNICODE_LBACTION_DIRECT:   Direct break.
+                UNICODE_LBACTION_EOF:      This line is the last line of text.
+
+                Note: Terminating newlines and spaces will not be trimmed
+                    by calling function, unicode_do_linebreak() (see
+                    "Notes" below).
+                    Text may be end without newline characters, or may end
+                    with extra characters (e.g. EOF).
+
+
+Customization
+=============
+
+1. Customizing line breaking properties
+
+To customize line breaking classes, character width informations
+or line breaking rules, read mklbproptab.py and relating files.
+
+Note: linebreaktab.c, linebreaktab.h and linebreakrule.html are 
+  generated by mklbproptab.py.  Don't edit these files manually.
+
+2. Customizing support functins
+
+Following functions may be customized to meet the needs of your
+application.
+
+Note: Don't modify built-in support functions contained in
+  unicode_linebreak.c.  Otherwise, write new functions then
+  seed them as arguments of unicode_lbinfo_alloc() and
+  unicode_do_linebreak().
+
+* flags is bitwise options to customize behavior of these functions.
+  For more details see unicode_linbreak.h.
+
+unicode_lbprop_funcptr find_lbprop_func(const char *chset, int flags);
+
+        Find a function to get character property suitable for
+        specified charset name chset.  If chset is NULL, length of
+        chset is zero or appropriate function has not been found,
+        a function unicode_find_lbprop_generic(), supporting generic
+        context, should be returned. 
+
+int tailor_width(unicode_char c, int width, enum unicode_lbclass lbc,
+                 int flags);
+
+        Returns customized width information of character c.
+        width is original width.  lbc is line breaking class of
+        character c.
+
+enum unicode_lbclass tailor_lbclass(unicode_char c, int width,
+                                    enum unicode_lbclass lbc, int flags);
+
+        Returns customized line breaking class information of
+        character c.  lbc is original line breaking class.  width
+        is width of character c.
+
+int is_line_exceeded(struct unicode_lbinfo *lbinfo, unicode_char *text,
+                     off_t start, size_t len, int maxlen);
+
+        Returns boolean value indicating whether width (length) of text
+        exceed maxlen or not.  text is buffer containing text fragment
+        to check.  start and textlen are offset on text and length of
+        text fragment.
+
+void writeout_cb(struct unicode_lbinfo *lbinfo, unicode_char *text,
+                 off_t start, size_t linelen, enum unicode_lbaction action);
+
+        See above.
+
+Note: Name of functions above are example.  Name these functions on
+    your accord.
+
+
+Notes
+=====
+
+Newline characters
+
+Lines broken by Explicit break oppotunity will end with each of
+following characters or sequence:
+
+    U+000A line feed (LF)
+    U+000B vertical tab (VT) (optional.  See unicode_linebreak.h).
+    U+000C form feed (FF).
+    U+000D carriage return (CR), not followed by LF.
+    U+0085 new line function (NEL) (optional.  See unicode_linebreak.h).
+    U+2028 LINE SEPARATOR
+    U+2029 PARAGRAPH SEPARATOR
+
+    And, one or more CR followed by LF.
+
+
+$$

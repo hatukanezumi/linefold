@@ -1,0 +1,2084 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+    "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="en-us">
+    <meta name="GENERATOR" content="mklbproptab.py">
+    <link rel="stylesheet" href="http://www.unicode.org/reports/reports.css">
+    <title>
+      UAX#14: Line Breaking Properties - Line Breaking Rules
+    </title>
+  </head>
+  <body>
+  <div class="body">
+
+  <p>This file was generated automatically
+  for convenience of verification.
+  To customize line breaking rules, read mklbproptab.py.</p>
+
+  <h2>Line Breaking Rules</h2>
+
+  <blockquote>
+    <p>! Mandatory break at the indicated position</p>
+    <p>× No break allowed at the indicated position</p>
+    <p>÷ Break allowed at the indicated position</p>
+  </blockquote>
+
+    <p class="rule">LB 7: Do not break before spaces or zero-width space.</p>
+    <p align="center"> × ( SP | ZW )</p>
+    <p class="rule">LB 8: Break after zero-width space.</p>
+    <p align="center">ZW ÷ </p>
+    <p class="rule">LB 9: Do not break a combining character sequence; treat it
+      as if it has the LB class of the base character in all of the
+      following rules.</p>
+    <p align="center">X CM* -&gt; X</p>
+    <p class="rule">LB 10: Treat any remaining combining mark as AL.</p>
+    <p align="center">X CM CM+ -&gt; X AL+</p>
+    <p class="rule">LB 11: Do not break before or after WORD JOINER and related
+      characters.</p>
+    <p align="center"> × WJ</p>
+    <p align="center">WJ × </p>
+    <p class="rule">LB 12: Do not break before or after NBSP and related characters.</p>
+    <p align="center">(!SP) × GL</p>
+    <p align="center">GL × </p>
+    <p class="rule">LB 13: Do not break before ‘]’ or ‘!’ or ‘;’ or ‘/’, even
+      after spaces.</p>
+    <p align="center"> × ( CL | EX | IS | SY )</p>
+    <p class="rule">LB 13ext: ditto.</p>
+    <p align="center"> × ( CLH | CLSP | CLHSP )</p>
+    <p class="rule">LB 14: Do not break after ‘[’, even after spaces.</p>
+    <p align="center">OP SP* × </p>
+    <p class="rule">LB 14ext: ditto.</p>
+    <p align="center">SPOP SP* × </p>
+    <p class="rule">LB 15: Do not break within ‘”[’, even with intervening spaces.</p>
+    <p align="center">QU SP* × OP</p>
+    <p class="rule">LB 15ext: ditto.</p>
+    <p align="center">QU SP* × SPOP</p>
+    <p class="rule">LB 16: Do not break within ‘]h’, even with intervening spaces.</p>
+    <p align="center">CL SP* × NS</p>
+    <p class="rule">LB 16ext: ditto.</p>
+    <p align="center">( CLH | CLSP | CLHSP ) SP* × NS</p>
+    <p class="rule">LB 17: Do not break within ‘——’, even with intervening spaces.</p>
+    <p align="center">B2 SP* × B2</p>
+    <p class="rule">LB 18: Break after spaces.</p>
+    <p align="center">SP ÷ </p>
+    <p class="rule">LB 18ext: ...and also break after closing punctuations with
+      virtual glue.</p>
+    <p align="center">( CLSP | CLHSP ) ÷ </p>
+    <p class="rule">LB 19: Do not break before or after ‘”’.</p>
+    <p align="center"> × QU</p>
+    <p align="center">QU × </p>
+    <p class="rule">LB 20: Break before and after unresolved CB.</p>
+    <p align="center"> ÷ CB</p>
+    <p align="center">CB ÷ </p>
+    <p class="rule">LB 21: Do not break before hyphen-minus, other hyphens,
+      fixed-width spaces, small kana and other non-starters, or after
+      acute accents.</p>
+    <p align="center"> × ( BA | HY | NS )</p>
+    <p align="center">BB × </p>
+    <p class="rule">LB 22: Do not break between two ellipses, or between letters
+      or numbers and ellipsis.</p>
+    <p align="center">( AL | ID | IN | NU ) × IN</p>
+    <p class="rule">LB 23: Do not break within ‘a9’, ‘3a’, or ‘H%’.</p>
+    <p align="center">ID × PO</p>
+    <p align="center">AL × NU</p>
+    <p align="center">NU × AL</p>
+    <p class="rule">LB 24: Do not break between prefix and letters or ideographs.</p>
+    <p align="center">PR × ID</p>
+    <p align="center">PR × AL</p>
+    <p align="center">PO × AL</p>
+    <p class="rule">LB 25: Do not break between the following pairs of classes
+      relevant to numbers:</p>
+    <p align="center">( CL | NU ) × ( PO | PR )</p>
+    <p align="center">( PO | PR ) × ( OP | NU )</p>
+    <p align="center">( HY | IS | NU | SY ) × NU</p>
+    <p class="rule">LB 25ext: ditto.</p>
+    <p align="center">CLH × ( PO | PR )</p>
+    <p class="rule">LB 25exc: ...but allow break before opening punctuations with
+      virtual glue.</p>
+    <p align="center">( PO | PR ) ÷ SPOP</p>
+    <p class="rule">LB 26: Do not break a Korean syllable.</p>
+    <p align="center">JL × ( JL | JV | H2 | H3 )</p>
+    <p align="center">( JV | H2 ) × ( JV | JT )</p>
+    <p align="center">( JT | H3 ) × JT</p>
+    <p class="rule">LB 27: Treat a Korean Syllable Block the same as ID.</p>
+    <p align="center">( JL | JV | JT | H2 | H3 ) × IN</p>
+    <p align="center">( JL | JV | JT | H2 | H3 ) × PO</p>
+    <p align="center">PR × ( JL | JV | JT | H2 | H3 )</p>
+    <p class="rule">LB 28: Do not break between alphabetics (“at”).</p>
+    <p align="center">AL × AL</p>
+    <p class="rule">LB 29: Do not break between numeric punctuation and
+      alphabetics ("e.g.").</p>
+    <p align="center">IS × AL</p>
+    <p class="rule">LB 30: Do not break between letters, numbers or ordinary
+      symbols and opening or closing punctuation</p>
+    <p align="center">( AL | NU ) × OP</p>
+    <p align="center">CL × ( AL | NU )</p>
+    <p class="rule">LB 30ext: ditto.</p>
+    <p align="center">CLH × ( AL | NU )</p>
+    <p class="rule">LB 31: Break everywhere else.</p>
+    <p align="center">ALL ÷ ALL</p>
+  <h2>Line Breaking Class Pair Table</h2>
+
+  <p>Following table has been generated by rules above.</p>
+
+  <div align="center">
+
+<table border="1" cellspacing="0" width="88%" class="pair">
+  <caption>Line Breaking Class Pair Table</caption>
+  <thead>
+  <tr>
+    <td>&nbsp;</td>
+    <th style="text-align: center; font-weight: bold;">OP</th>
+    <th style="text-align: center; font-weight: bold;">CL</th>
+    <th style="text-align: center; font-weight: bold;">QU</th>
+    <th style="text-align: center; font-weight: bold;">GL</th>
+    <th style="text-align: center; font-weight: bold;">NS</th>
+    <th style="text-align: center; font-weight: bold;">EX</th>
+    <th style="text-align: center; font-weight: bold;">SY</th>
+    <th style="text-align: center; font-weight: bold;">IS</th>
+    <th style="text-align: center; font-weight: bold;">PR</th>
+    <th style="text-align: center; font-weight: bold;">PO</th>
+    <th style="text-align: center; font-weight: bold;">NU</th>
+    <th style="text-align: center; font-weight: bold;">AL</th>
+    <th style="text-align: center; font-weight: bold;">ID</th>
+    <th style="text-align: center; font-weight: bold;">IN</th>
+    <th style="text-align: center; font-weight: bold;">HY</th>
+    <th style="text-align: center; font-weight: bold;">BA</th>
+    <th style="text-align: center; font-weight: bold;">BB</th>
+    <th style="text-align: center; font-weight: bold;">B2</th>
+    <th style="text-align: center; font-weight: bold;">ZW</th>
+    <th style="text-align: center; font-weight: bold;">CM</th>
+    <th style="text-align: center; font-weight: bold;">WJ</th>
+    <th style="text-align: center; font-weight: bold;">H2</th>
+    <th style="text-align: center; font-weight: bold;">H3</th>
+    <th style="text-align: center; font-weight: bold;">JL</th>
+    <th style="text-align: center; font-weight: bold;">JV</th>
+    <th style="text-align: center; font-weight: bold;">JT</th>
+    <th style="text-align: center; font-weight: bold;">SPOP</th>
+    <th style="text-align: center; font-weight: bold;">CLH</th>
+    <th style="text-align: center; font-weight: bold;">CLSP</th>
+    <th style="text-align: center; font-weight: bold;">CLHSP</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">OP</th>
+
+    <th style="text-align: center;" title="14: OP SP* × OP">^</th>
+
+    <th style="text-align: center;" title="13: OP × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × QU">^</th>
+
+    <th style="text-align: center;" title="12: OP × GL ; 14: OP SP* × GL">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × NS">^</th>
+
+    <th style="text-align: center;" title="13: OP × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: OP × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: OP × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × PR">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × PO">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × NU">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × AL">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × ID">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × IN">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × HY">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × BA">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × BB">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × B2">^</th>
+
+    <th style="text-align: center;" title="7: OP × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 14: OP SP* × CM">@</th>
+
+    <th style="text-align: center;" title="11: OP × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × H2">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × H3">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × JL">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × JV">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × JT">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × SPOP">^</th>
+
+    <th style="text-align: center;" title="13ext: OP × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: OP × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: OP × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">CL</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: CL ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: CL × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: CL × QU">%</th>
+
+    <th style="text-align: center;" title="12: CL × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="16: CL SP* × NS">^</th>
+
+    <th style="text-align: center;" title="13: CL × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: CL × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: CL × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 25: CL × PR">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 25: CL × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 30: CL × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 30: CL × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: CL ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: CL ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: CL × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: CL × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: CL ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: CL ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: CL × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: CL × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: CL ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: CL ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: CL ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: CL ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: CL ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: CL ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: CL × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: CL × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: CL × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">QU</th>
+
+    <th style="text-align: center;" title="15: QU SP* × OP">^</th>
+
+    <th style="text-align: center;" title="13: QU × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: QU × QU">%</th>
+
+    <th style="text-align: center;" title="12: QU × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 19: QU × NS">%</th>
+
+    <th style="text-align: center;" title="13: QU × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: QU × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: QU × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 19: QU × PR">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 19: QU × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 19: QU × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 19: QU × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 19: QU × ID">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 19: QU × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 19: QU × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 19: QU × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 19: QU × BB">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 19: QU × B2">%</th>
+
+    <th style="text-align: center;" title="7: QU × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: QU × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 19: QU × H2">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 19: QU × H3">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 19: QU × JL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 19: QU × JV">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 19: QU × JT">%</th>
+
+    <th style="text-align: center;" title="15ext: QU SP* × SPOP">^</th>
+
+    <th style="text-align: center;" title="13ext: QU × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: QU × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: QU × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">GL</th>
+
+    <th style="text-align: center;" title="12: GL × OP ; 18: SP ÷ OP">%</th>
+
+    <th style="text-align: center;" title="12: GL × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="12: GL × QU ; 18: SP ÷ QU">%</th>
+
+    <th style="text-align: center;" title="12: GL × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="12: GL × NS ; 18: SP ÷ NS">%</th>
+
+    <th style="text-align: center;" title="12: GL × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="12: GL × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="12: GL × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="12: GL × PR ; 18: SP ÷ PR">%</th>
+
+    <th style="text-align: center;" title="12: GL × PO ; 18: SP ÷ PO">%</th>
+
+    <th style="text-align: center;" title="12: GL × NU ; 18: SP ÷ NU">%</th>
+
+    <th style="text-align: center;" title="12: GL × AL ; 18: SP ÷ AL">%</th>
+
+    <th style="text-align: center;" title="12: GL × ID ; 18: SP ÷ ID">%</th>
+
+    <th style="text-align: center;" title="12: GL × IN ; 18: SP ÷ IN">%</th>
+
+    <th style="text-align: center;" title="12: GL × HY ; 18: SP ÷ HY">%</th>
+
+    <th style="text-align: center;" title="12: GL × BA ; 18: SP ÷ BA">%</th>
+
+    <th style="text-align: center;" title="12: GL × BB ; 18: SP ÷ BB">%</th>
+
+    <th style="text-align: center;" title="12: GL × B2 ; 18: SP ÷ B2">%</th>
+
+    <th style="text-align: center;" title="7: GL × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: GL × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="12: GL × H2 ; 18: SP ÷ H2">%</th>
+
+    <th style="text-align: center;" title="12: GL × H3 ; 18: SP ÷ H3">%</th>
+
+    <th style="text-align: center;" title="12: GL × JL ; 18: SP ÷ JL">%</th>
+
+    <th style="text-align: center;" title="12: GL × JV ; 18: SP ÷ JV">%</th>
+
+    <th style="text-align: center;" title="12: GL × JT ; 18: SP ÷ JT">%</th>
+
+    <th style="text-align: center;" title="12: GL × SPOP ; 18: SP ÷ SPOP">%</th>
+
+    <th style="text-align: center;" title="12: GL × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="12: GL × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="12: GL × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">NS</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: NS ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: NS × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: NS × QU">%</th>
+
+    <th style="text-align: center;" title="12: NS × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: NS × NS">%</th>
+
+    <th style="text-align: center;" title="13: NS × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: NS × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: NS × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: NS ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: NS ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: NS ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: NS ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: NS ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: NS ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: NS × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: NS × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: NS ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: NS ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: NS × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: NS × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: NS ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: NS ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: NS ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: NS ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: NS ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: NS ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: NS × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: NS × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: NS × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">EX</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: EX ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: EX × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: EX × QU">%</th>
+
+    <th style="text-align: center;" title="12: EX × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: EX × NS">%</th>
+
+    <th style="text-align: center;" title="13: EX × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: EX × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: EX × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: EX ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: EX ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: EX ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: EX ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: EX ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: EX ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: EX × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: EX × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: EX ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: EX ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: EX × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: EX × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: EX ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: EX ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: EX ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: EX ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: EX ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: EX ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: EX × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: EX × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: EX × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">SY</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: SY ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: SY × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: SY × QU">%</th>
+
+    <th style="text-align: center;" title="12: SY × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: SY × NS">%</th>
+
+    <th style="text-align: center;" title="13: SY × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: SY × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: SY × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: SY ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: SY ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 25: SY × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: SY ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: SY ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: SY ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: SY × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: SY × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: SY ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: SY ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: SY × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: SY × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: SY ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: SY ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: SY ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: SY ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: SY ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: SY ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: SY × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: SY × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: SY × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">IS</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: IS ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: IS × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: IS × QU">%</th>
+
+    <th style="text-align: center;" title="12: IS × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: IS × NS">%</th>
+
+    <th style="text-align: center;" title="13: IS × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: IS × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: IS × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: IS ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: IS ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 25: IS × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 29: IS × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: IS ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: IS ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: IS × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: IS × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: IS ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: IS ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: IS × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: IS × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: IS ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: IS ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: IS ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: IS ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: IS ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: IS ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: IS × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: IS × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: IS × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">PR</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 25: PR × OP">%</th>
+
+    <th style="text-align: center;" title="13: PR × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: PR × QU">%</th>
+
+    <th style="text-align: center;" title="12: PR × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: PR × NS">%</th>
+
+    <th style="text-align: center;" title="13: PR × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: PR × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: PR × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: PR ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: PR ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 25: PR × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 24: PR × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 24: PR × ID">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: PR ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: PR × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: PR × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: PR ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: PR ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: PR × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: PR × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 27: PR × H2">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 27: PR × H3">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 27: PR × JL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 27: PR × JV">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 27: PR × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 25exc: PR ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: PR × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: PR × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: PR × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">PO</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 25: PO × OP">%</th>
+
+    <th style="text-align: center;" title="13: PO × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: PO × QU">%</th>
+
+    <th style="text-align: center;" title="12: PO × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: PO × NS">%</th>
+
+    <th style="text-align: center;" title="13: PO × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: PO × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: PO × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: PO ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: PO ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 25: PO × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 24: PO × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: PO ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: PO ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: PO × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: PO × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: PO ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: PO ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: PO × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: PO × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: PO ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: PO ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: PO ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: PO ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: PO ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 25exc: PO ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: PO × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: PO × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: PO × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">NU</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 30: NU × OP">%</th>
+
+    <th style="text-align: center;" title="13: NU × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: NU × QU">%</th>
+
+    <th style="text-align: center;" title="12: NU × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: NU × NS">%</th>
+
+    <th style="text-align: center;" title="13: NU × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: NU × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: NU × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 25: NU × PR">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 25: NU × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 25: NU × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 23: NU × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: NU ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 22: NU × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: NU × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: NU × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: NU ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: NU ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: NU × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: NU × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: NU ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: NU ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: NU ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: NU ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: NU ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: NU ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: NU × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: NU × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: NU × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">AL</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 30: AL × OP">%</th>
+
+    <th style="text-align: center;" title="13: AL × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: AL × QU">%</th>
+
+    <th style="text-align: center;" title="12: AL × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: AL × NS">%</th>
+
+    <th style="text-align: center;" title="13: AL × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: AL × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: AL × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: AL ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: AL ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 23: AL × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 28: AL × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: AL ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 22: AL × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: AL × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: AL × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: AL ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: AL ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: AL × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 10: X CM CM+ -&gt; X AL+ ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: AL × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: AL ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: AL ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: AL ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: AL ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: AL ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: AL ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: AL × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: AL × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: AL × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">ID</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: ID ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: ID × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: ID × QU">%</th>
+
+    <th style="text-align: center;" title="12: ID × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: ID × NS">%</th>
+
+    <th style="text-align: center;" title="13: ID × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: ID × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: ID × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: ID ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 23: ID × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: ID ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: ID ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: ID ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 22: ID × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: ID × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: ID × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: ID ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: ID ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: ID × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: ID × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: ID ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: ID ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: ID ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: ID ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: ID ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: ID ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: ID × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: ID × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: ID × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">IN</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: IN ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: IN × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: IN × QU">%</th>
+
+    <th style="text-align: center;" title="12: IN × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: IN × NS">%</th>
+
+    <th style="text-align: center;" title="13: IN × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: IN × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: IN × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: IN ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: IN ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: IN ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: IN ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: IN ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 22: IN × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: IN × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: IN × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: IN ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: IN ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: IN × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: IN × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: IN ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: IN ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: IN ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: IN ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: IN ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: IN ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: IN × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: IN × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: IN × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">HY</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: HY ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: HY × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: HY × QU">%</th>
+
+    <th style="text-align: center;" title="12: HY × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: HY × NS">%</th>
+
+    <th style="text-align: center;" title="13: HY × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: HY × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: HY × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: HY ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: HY ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 25: HY × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: HY ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: HY ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: HY ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: HY × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: HY × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: HY ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: HY ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: HY × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: HY × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: HY ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: HY ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: HY ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: HY ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: HY ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: HY ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: HY × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: HY × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: HY × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">BA</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: BA ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: BA × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: BA × QU">%</th>
+
+    <th style="text-align: center;" title="12: BA × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: BA × NS">%</th>
+
+    <th style="text-align: center;" title="13: BA × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: BA × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: BA × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: BA ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: BA ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: BA ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: BA ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: BA ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: BA ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: BA × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: BA × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: BA ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: BA ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: BA × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: BA × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: BA ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: BA ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: BA ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: BA ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: BA ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: BA ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: BA × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: BA × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: BA × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">BB</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 21: BB × OP">%</th>
+
+    <th style="text-align: center;" title="13: BB × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: BB × QU">%</th>
+
+    <th style="text-align: center;" title="12: BB × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: BB × NS">%</th>
+
+    <th style="text-align: center;" title="13: BB × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: BB × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: BB × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 21: BB × PR">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 21: BB × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 21: BB × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 21: BB × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 21: BB × ID">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 21: BB × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: BB × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: BB × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 21: BB × BB">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 21: BB × B2">%</th>
+
+    <th style="text-align: center;" title="7: BB × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: BB × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 21: BB × H2">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 21: BB × H3">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 21: BB × JL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 21: BB × JV">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 21: BB × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 21: BB × SPOP">%</th>
+
+    <th style="text-align: center;" title="13ext: BB × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: BB × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: BB × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">B2</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: B2 ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: B2 × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: B2 × QU">%</th>
+
+    <th style="text-align: center;" title="12: B2 × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: B2 × NS">%</th>
+
+    <th style="text-align: center;" title="13: B2 × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: B2 × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: B2 × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: B2 ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: B2 ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: B2 ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: B2 ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: B2 ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: B2 ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: B2 × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: B2 × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: B2 ÷ BB">_</th>
+
+    <th style="text-align: center;" title="17: B2 SP* × B2">^</th>
+
+    <th style="text-align: center;" title="7: B2 × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: B2 × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: B2 ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: B2 ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: B2 ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: B2 ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: B2 ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: B2 ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: B2 × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: B2 × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: B2 × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">ZW</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ OP ; 18: SP ÷ OP">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ CL ; 13: SP × CL">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ QU ; 18: SP ÷ QU">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ GL ; 18: SP ÷ GL">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ NS ; 18: SP ÷ NS">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ EX ; 13: SP × EX">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ SY ; 13: SP × SY">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ IS ; 13: SP × IS">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ PR ; 18: SP ÷ PR">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ PO ; 18: SP ÷ PO">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ NU ; 18: SP ÷ NU">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ AL ; 18: SP ÷ AL">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ ID ; 18: SP ÷ ID">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ IN ; 18: SP ÷ IN">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ HY ; 18: SP ÷ HY">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ BA ; 18: SP ÷ BA">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ BB ; 18: SP ÷ BB">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ B2 ; 18: SP ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: ZW × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ CM ; 18: SP ÷ CM">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ WJ ; 11: SP × WJ">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ H2 ; 18: SP ÷ H2">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ H3 ; 18: SP ÷ H3">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ JL ; 18: SP ÷ JL">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ JV ; 18: SP ÷ JV">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ JT ; 18: SP ÷ JT">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ SPOP ; 18: SP ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ CLH ; 13ext: SP × CLH">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ CLSP ; 13ext: SP × CLSP">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ CLHSP ; 13ext: SP × CLHSP">_</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">CM</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 30: CM × OP">%</th>
+
+    <th style="text-align: center;" title="13: CM × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: CM × QU">%</th>
+
+    <th style="text-align: center;" title="12: CM × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: CM × NS">%</th>
+
+    <th style="text-align: center;" title="13: CM × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: CM × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: CM × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: CM ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 31: CM ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 23: CM × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 28: CM × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: CM ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 22: CM × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: CM × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: CM × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: CM ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: CM ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: CM × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 10: X CM CM+ -&gt; X AL+ ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: CM × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: CM ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: CM ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: CM ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: CM ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: CM ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: CM ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: CM × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: CM × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: CM × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">WJ</th>
+
+    <th style="text-align: center;" title="11: WJ × OP ; 18: SP ÷ OP">%</th>
+
+    <th style="text-align: center;" title="11: WJ × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="11: WJ × QU ; 18: SP ÷ QU">%</th>
+
+    <th style="text-align: center;" title="11: WJ × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="11: WJ × NS ; 18: SP ÷ NS">%</th>
+
+    <th style="text-align: center;" title="11: WJ × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="11: WJ × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="11: WJ × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="11: WJ × PR ; 18: SP ÷ PR">%</th>
+
+    <th style="text-align: center;" title="11: WJ × PO ; 18: SP ÷ PO">%</th>
+
+    <th style="text-align: center;" title="11: WJ × NU ; 18: SP ÷ NU">%</th>
+
+    <th style="text-align: center;" title="11: WJ × AL ; 18: SP ÷ AL">%</th>
+
+    <th style="text-align: center;" title="11: WJ × ID ; 18: SP ÷ ID">%</th>
+
+    <th style="text-align: center;" title="11: WJ × IN ; 18: SP ÷ IN">%</th>
+
+    <th style="text-align: center;" title="11: WJ × HY ; 18: SP ÷ HY">%</th>
+
+    <th style="text-align: center;" title="11: WJ × BA ; 18: SP ÷ BA">%</th>
+
+    <th style="text-align: center;" title="11: WJ × BB ; 18: SP ÷ BB">%</th>
+
+    <th style="text-align: center;" title="11: WJ × B2 ; 18: SP ÷ B2">%</th>
+
+    <th style="text-align: center;" title="7: WJ × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: WJ × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="11: WJ × H2 ; 18: SP ÷ H2">%</th>
+
+    <th style="text-align: center;" title="11: WJ × H3 ; 18: SP ÷ H3">%</th>
+
+    <th style="text-align: center;" title="11: WJ × JL ; 18: SP ÷ JL">%</th>
+
+    <th style="text-align: center;" title="11: WJ × JV ; 18: SP ÷ JV">%</th>
+
+    <th style="text-align: center;" title="11: WJ × JT ; 18: SP ÷ JT">%</th>
+
+    <th style="text-align: center;" title="11: WJ × SPOP ; 18: SP ÷ SPOP">%</th>
+
+    <th style="text-align: center;" title="11: WJ × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="11: WJ × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="11: WJ × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">H2</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: H2 ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: H2 × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: H2 × QU">%</th>
+
+    <th style="text-align: center;" title="12: H2 × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: H2 × NS">%</th>
+
+    <th style="text-align: center;" title="13: H2 × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: H2 × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: H2 × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: H2 ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 27: H2 × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: H2 ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: H2 ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: H2 ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 27: H2 × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: H2 × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: H2 × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: H2 ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: H2 ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: H2 × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: H2 × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: H2 ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: H2 ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: H2 ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 26: H2 × JV">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 26: H2 × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: H2 ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: H2 × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: H2 × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: H2 × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">H3</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: H3 ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: H3 × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: H3 × QU">%</th>
+
+    <th style="text-align: center;" title="12: H3 × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: H3 × NS">%</th>
+
+    <th style="text-align: center;" title="13: H3 × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: H3 × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: H3 × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: H3 ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 27: H3 × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: H3 ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: H3 ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: H3 ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 27: H3 × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: H3 × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: H3 × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: H3 ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: H3 ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: H3 × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: H3 × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: H3 ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: H3 ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: H3 ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: H3 ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 26: H3 × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: H3 ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: H3 × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: H3 × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: H3 × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">JL</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: JL ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: JL × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: JL × QU">%</th>
+
+    <th style="text-align: center;" title="12: JL × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: JL × NS">%</th>
+
+    <th style="text-align: center;" title="13: JL × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: JL × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: JL × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: JL ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 27: JL × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: JL ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: JL ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: JL ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 27: JL × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: JL × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: JL × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: JL ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: JL ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: JL × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: JL × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 26: JL × H2">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 26: JL × H3">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 26: JL × JL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 26: JL × JV">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: JL ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: JL ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: JL × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: JL × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: JL × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">JV</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: JV ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: JV × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: JV × QU">%</th>
+
+    <th style="text-align: center;" title="12: JV × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: JV × NS">%</th>
+
+    <th style="text-align: center;" title="13: JV × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: JV × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: JV × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: JV ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 27: JV × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: JV ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: JV ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: JV ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 27: JV × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: JV × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: JV × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: JV ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: JV ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: JV × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: JV × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: JV ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: JV ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: JV ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 26: JV × JV">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 26: JV × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: JV ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: JV × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: JV × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: JV × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">JT</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: JT ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: JT × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: JT × QU">%</th>
+
+    <th style="text-align: center;" title="12: JT × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: JT × NS">%</th>
+
+    <th style="text-align: center;" title="13: JT × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: JT × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: JT × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: JT ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 27: JT × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: JT ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: JT ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: JT ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 27: JT × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: JT × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: JT × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: JT ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: JT ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: JT × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: JT × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: JT ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: JT ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: JT ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: JT ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 26: JT × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: JT ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: JT × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: JT × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: JT × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">SPOP</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × OP">^</th>
+
+    <th style="text-align: center;" title="13: SPOP × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × QU">^</th>
+
+    <th style="text-align: center;" title="12: SPOP × GL ; 14ext: SPOP SP* × GL">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × NS">^</th>
+
+    <th style="text-align: center;" title="13: SPOP × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: SPOP × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: SPOP × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × PR">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × PO">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × NU">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × AL">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × ID">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × IN">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × HY">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × BA">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × BB">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × B2">^</th>
+
+    <th style="text-align: center;" title="7: SPOP × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 14ext: SPOP SP* × CM">@</th>
+
+    <th style="text-align: center;" title="11: SPOP × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × H2">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × H3">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × JL">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × JV">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × JT">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × SPOP">^</th>
+
+    <th style="text-align: center;" title="13ext: SPOP × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: SPOP × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: SPOP × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">CLH</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: CLH ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: CLH × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: CLH × QU">%</th>
+
+    <th style="text-align: center;" title="12: CLH × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="16ext: CLH SP* × NS">^</th>
+
+    <th style="text-align: center;" title="13: CLH × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: CLH × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: CLH × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 25ext: CLH × PR">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 25ext: CLH × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 30ext: CLH × NU">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 30ext: CLH × AL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: CLH ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 31: CLH ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: CLH × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: CLH × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: CLH ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: CLH ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: CLH × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: CLH × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: CLH ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: CLH ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: CLH ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: CLH ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: CLH ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: CLH ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: CLH × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: CLH × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: CLH × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">CLSP</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 18ext: CLSP ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: CLSP × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 18ext: CLSP ÷ QU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ GL ; 18ext: CLSP ÷ GL">_</th>
+
+    <th style="text-align: center;" title="16ext: CLSP SP* × NS">^</th>
+
+    <th style="text-align: center;" title="13: CLSP × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: CLSP × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: CLSP × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 18ext: CLSP ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 18ext: CLSP ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 18ext: CLSP ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 18ext: CLSP ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 18ext: CLSP ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 18ext: CLSP ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 18ext: CLSP ÷ HY">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 18ext: CLSP ÷ BA">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 18ext: CLSP ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 18ext: CLSP ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: CLSP × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ CM ; 18ext: CLSP ÷ CM">_</th>
+
+    <th style="text-align: center;" title="11: CLSP × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 18ext: CLSP ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 18ext: CLSP ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 18ext: CLSP ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 18ext: CLSP ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 18ext: CLSP ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 18ext: CLSP ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: CLSP × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: CLSP × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: CLSP × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">CLHSP</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 18ext: CLHSP ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: CLHSP × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 18ext: CLHSP ÷ QU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ GL ; 18ext: CLHSP ÷ GL">_</th>
+
+    <th style="text-align: center;" title="16ext: CLHSP SP* × NS">^</th>
+
+    <th style="text-align: center;" title="13: CLHSP × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: CLHSP × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: CLHSP × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 18ext: CLHSP ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 18ext: CLHSP ÷ PO">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 18ext: CLHSP ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 18ext: CLHSP ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 18ext: CLHSP ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 18ext: CLHSP ÷ IN">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 18ext: CLHSP ÷ HY">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 18ext: CLHSP ÷ BA">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 18ext: CLHSP ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 18ext: CLHSP ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: CLHSP × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ CM ; 18ext: CLHSP ÷ CM">_</th>
+
+    <th style="text-align: center;" title="11: CLHSP × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 18ext: CLHSP ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 18ext: CLHSP ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 18ext: CLHSP ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 18ext: CLHSP ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 18ext: CLHSP ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 18ext: CLHSP ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: CLHSP × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: CLHSP × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: CLHSP × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  </tr>
+
+  </tbody>
+</table>
+
+  </div>
+  <blockquote>
+    <p>This table uses the followng notation:</p>
+    <p>^ denotes a <i>prohibited break</i>: B ^ A is equivalent to
+      <b>B</b> SP* × <b>A</b>.</p>
+    <p>% denotes an <i>indirect break opportunity</i>.
+      B % A is equivalent to <b>B</b> × <b>A</b> <i>and</i>
+      <b>B</b> SP+ ÷ <b>A</b>;
+      in other words, do not break before A, unless one or more spaces
+      follow B.</p>
+    <p>@ denotes a <i>prohibited break for combining marks</i>:
+      B @ A is equivalent to <b>B</b> SP* × <b>A</b>, where <b>A</b> is of
+      class CM.</p>
+    <p># denotes an <i>indirect break opportunity for combining marks
+      following a space</i>. B # A is equivalent to
+      (<b>B</b> × <b>A</b> <i>and</i> <b>B</b> SP+ ÷ <b>A</b>)
+      where <b>A</b> is of cla5ss CM.</p>
+    <p>_ denotes a <i>direct break opportunity</i>.</p>
+  </blockquote>
+  </div>
+  </body>
+</html>
+
