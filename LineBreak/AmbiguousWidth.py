@@ -451,21 +451,21 @@ def getmap(propmap):
     # In East Asian box-filled folding context, especially on narrow or
     # fixed-width faces, ellipsises occationally allow Break Before but
     # are inseparable between themselves.  As a workaround, assign them to
-    # BB.  Vertical double-width kana repeat marks will be handled by same
+    # B2.  Vertical double-width kana repeat marks will be handled by same
     # manner.
     # Note:
     # - If it is preferred that breaks within multi-width ellipsises are
     #   allowed, change classes to 'ID'.
-    # - If alphabetic behavior is preferred, change classes to 'IN'.
+    # - If alphabetic behavior is preferred, change the classes to 'IN'.
     for r in legacy_maps.keys():
         legacy_maps[r].update( {
-            0x2026: (2, 'BB'), # TWO DOT LEADER
-            0x2027: (2, 'BB'), # HORIZONTAL ELLIPSIS
-            0x3033: (2, 'BB'), # VERTICAL KANA REPEAT MARK UPPER HALF
-            0x3034: (2, 'BB'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
-            0x3035: (2, 'BB'), # VERTICAL KANA REPEAT MARK LOWER HALF
-            0xFE30: (2, 'BB'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
-            0xFE19: (2, 'BB'), # PRESENTATION FORM FOR VERTICAL HORIZONTAL ELLIPSIS
+            0x2026: (2, 'B2'), # TWO DOT LEADER
+            0x2027: (2, 'B2'), # HORIZONTAL ELLIPSIS
+            0x3033: (2, 'B2'), # VERTICAL KANA REPEAT MARK UPPER HALF
+            0x3034: (2, 'B2'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
+            0x3035: (2, 'B2'), # VERTICAL KANA REPEAT MARK LOWER HALF
+            0xFE30: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
+            0xFE19: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL HORIZONTAL ELLIPSIS
             } )
 
     return legacy_maps

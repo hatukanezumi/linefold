@@ -38,7 +38,7 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
 
 /*
  * Resolve character width within generic (Unicode) context, even if
- * character set context is specified.
+ * character set context was specified.
  */
 #define UNICODE_LBOPTION_GENERIC_WIDTH           1
 
@@ -49,68 +49,74 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
  * multibyte context.  Set these options to treat such letters always
  * Narrow.
  */
-#define UNICODE_LBOPTION_ALWAYS_NARROW_LATIN     2
-#define UNICODE_LBOPTION_ALWAYS_NARROW_GREEK     4
-#define UNICODE_LBOPTION_ALWAYS_NARROW_CYRILLIC  8
+#define UNICODE_LBOPTION_ALWAYS_NARROW_LATIN     (1<<1)
+#define UNICODE_LBOPTION_ALWAYS_NARROW_GREEK     (1<<2)
+#define UNICODE_LBOPTION_ALWAYS_NARROW_CYRILLIC  (1<<3)
 
 /*
- * Set this to allow break after soft hyphen. By default, breaking
+ * Set this to allow break after HY (U+002D HYPHEN-MINUS), before AL.
+ * By default, breaking directly before AL is not allowed.
+ */
+#define UNICODE_LBOPTION_BREAK_HY                (1<<4)
+
+/*
+ * Set this to allow break after U+00AD SOFT HYPHEN.  By default, breaking
  * directly after soft hyphen is not allowed.
  */
-#define UNICODE_LBOPTION_BREAK_SOFT_HYPHEN       16
+#define UNICODE_LBOPTION_BREAK_SOFT_HYPHEN       (1<<5)
 
 /*
  * Set this to treat U+0085 NEL as CM, not BK. [UAX#14]
  */
-#define UNICODE_LBOPTION_NOBREAK_NL              32
+#define UNICODE_LBOPTION_NOBREAK_NL              (1<<6)
 
 /*
  * Set this to treat U+000B vertical tab as CM, not BK. [UAX#14]
  */
-#define UNICODE_LBOPTION_NOBREAK_VT              64
+#define UNICODE_LBOPTION_NOBREAK_VT              (1<<7)
 
 /*
  * Set this to disable "burasage" (hunging punctuation in East Asian
  * text).
  */
-#define UNICODE_LBOPTION_NO_HUNGING_PUNCT        128
+#define UNICODE_LBOPTION_NO_HUNGING_PUNCT        (1<<8)
 
 /*
  * By default, Wide OP/CL characters are treated as if they are a
  * Narrow character preceded/followed by SP.  Set this to disable
  * such feature.
  */
-#define UNICODE_LBOPTION_WIDE_PUNCT_WITHOUT_GLUE 256
+#define UNICODE_LBOPTION_WIDE_PUNCT_WITHOUT_GLUE (1<<9)
 
 /*
  * By default, IDEOGRAPHIC SPACE is treated as ID.  Set this to treat
  * it as SP.
  */
-#define UNICODE_LBOPTION_IDSP_IS_SP              512
+#define UNICODE_LBOPTION_IDSP_IS_SP              (1<<10)
 
 /*
  * By default, small hiragana/katakana and KATAKANA-HIRAGANA PROLONGED
  * SIGN are NS.  Set this to treat these characters as ID. [JIS X 4051]
  */
-#define UNICODE_LBOPTION_RELAX_KANA_NS           1024
+#define UNICODE_LBOPTION_RELAX_KANA_NS           (1<<11)
 
 /*
  * Set this to treat spanish quotations INVERTED EXCLAMATION MARK and
  * INVERTED QUESTION MARK as AL, not OP. [UAX#14]
  */
-#define UNICODE_LBOPTION_OPAL_IS_AL              2048
+#define UNICODE_LBOPTION_OPAL_IS_AL              (1<<12)
 
 /*
  * Set this option to treat any of ID, hangul syllables (H2, H3) or
  * hangul combining jamos (JT, JV, JL) as AL.
  * WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
  */
-#define UNICODE_LBOPTION_FORCE_AL                4096
+#define UNICODE_LBOPTION_FORCE_AL                (1<<13)
 
 /*
  * Set this to break SP+CM sequence. [UAX#14]
  */
-#define UNICODE_LBOPTION_BREAK_SPCM              8192
+#define UNICODE_LBOPTION_BREAK_SPCM              (1<<14)
 
 /* 
  * Set this option to force break unbreakable text longer than specified
@@ -118,14 +124,23 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
  * This violate line breaking rules then may cause break within words,
  * syllables, characters or on somewhere unpreferred.
  */
-#define UNICODE_LBOPTION_FORCE_LINEWIDTH         16384
+#define UNICODE_LBOPTION_FORCE_LINEWIDTH         (1<<15)
 
 #define UNICODE_LBOPTION_DEFAULT                 0
 
 /*
- * Hard limit of line length (0 means unlimitd).
+ * Hard length limit of unboken squence.
+ * Note:
+ *   Following value is the maximum number of octet sequences consisting
+ *   character, in 1000 octets terminated by CRLF.  Because, in `legacy'
+ *   encodings single character can be assumed occupying 5 octets or less
+ *   (6 octets is very rare).  For example: by ISO 2022 encoding scheme,
+ *   199 sequences consist of a invokation/designation sequence (3 or 4
+ *   octets) and a character sequence (2 or 1 octets; 3 or more are rare),
+ *   then at end of line US-ASCII is designated (3 octets), and then CRLF
+ *   follows (2 octets).
  */
-#define UNICODE_LINEBREAK_HARD_LIMIT             998
+#define UNICODE_LINEBREAK_HARD_LIMIT             199
 
 /*
  * Character properties related on line breaking behavior.
@@ -161,9 +176,8 @@ struct unicode_lbinfo
 extern struct unicode_lbinfo
 *unicode_lbinfo_alloc(unicode_char *, size_t,
                       unicode_lbprop_funcptr(*)(const char *, int),
-                      int (*)(unicode_char, int, enum unicode_lbclass, int),
-                      enum unicode_lbclass
-		      (*)(unicode_char, int, enum unicode_lbclass, int),
+                      void (*)(unicode_char, int *, enum unicode_lbclass *,
+			       int),
                       const char *, int, void *);
 
 extern void unicode_lbinfo_free(struct unicode_lbinfo *);

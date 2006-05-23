@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 		alloced = catutf8(&text, &textlen, alloced, buf);
 	fclose(ifp);
 
-	if ((lbi = unicode_lbinfo_alloc(text, textlen, NULL, NULL, NULL,
+	if ((lbi = unicode_lbinfo_alloc(text, textlen, NULL, NULL,
 					chset, opt, NULL)) == NULL)
 	{
 		if (text != NULL) free(text);
