@@ -409,8 +409,8 @@ struct unicode_lbprop unicode_lbprop_tab[] = {
     {0x10D0, 0x10FC, 1, UNICODE_LBCLASS_AL},
     {0x1100, 0x1159, 2, UNICODE_LBCLASS_JL},
     {0x115F, 0x115F, 2, UNICODE_LBCLASS_JL},
-    {0x1160, 0x11A2, 1, UNICODE_LBCLASS_JV},
-    {0x11A8, 0x11F9, 1, UNICODE_LBCLASS_JT},
+    {0x1160, 0x11A2, 2, UNICODE_LBCLASS_JV},
+    {0x11A8, 0x11F9, 2, UNICODE_LBCLASS_JT},
     {0x1200, 0x1248, 1, UNICODE_LBCLASS_AL},
     {0x124A, 0x124D, 1, UNICODE_LBCLASS_AL},
     {0x1250, 0x1256, 1, UNICODE_LBCLASS_AL},
@@ -1833,11 +1833,6 @@ struct unicode_lbprop unicode_lbprop_C_tab[] = {
     {0x03A3, 0x03A9, 2, UNICODE_LBCLASS_AL},
     {0x03B1, 0x03C1, 2, UNICODE_LBCLASS_AL},
     {0x03C3, 0x03C9, 2, UNICODE_LBCLASS_AL},
-    {0x115A, 0x115E, 2, UNICODE_LBCLASS_AL},
-    {0x115F, 0x115F, 2, UNICODE_LBCLASS_JL},
-    {0x1160, 0x11A2, 2, UNICODE_LBCLASS_JV},
-    {0x11A3, 0x11A7, 2, UNICODE_LBCLASS_AL},
-    {0x11A8, 0x11F9, 2, UNICODE_LBCLASS_JT},
     {0x2013, 0x2013, 2, UNICODE_LBCLASS_BA},
     {0x2014, 0x2014, 2, UNICODE_LBCLASS_B2},
     {0x2018, 0x2019, 2, UNICODE_LBCLASS_QU},
@@ -1921,7 +1916,7 @@ struct unicode_lbprop unicode_lbprop_C_tab[] = {
     {0, 0, 0, 0}
 };
 
-size_t unicode_lbprop_C_len = 100;
+size_t unicode_lbprop_C_len = 95;
 
 struct unicode_lbprop unicode_lbprop_G_tab[] = {
     {0x00A4, 0x00A4, 2, UNICODE_LBCLASS_PR},
@@ -1942,11 +1937,6 @@ struct unicode_lbprop unicode_lbprop_G_tab[] = {
     {0x0401, 0x0401, 2, UNICODE_LBCLASS_AL},
     {0x0410, 0x044F, 2, UNICODE_LBCLASS_AL},
     {0x0451, 0x0451, 2, UNICODE_LBCLASS_AL},
-    {0x115A, 0x115E, 2, UNICODE_LBCLASS_AL},
-    {0x115F, 0x115F, 2, UNICODE_LBCLASS_JL},
-    {0x1160, 0x11A2, 2, UNICODE_LBCLASS_JV},
-    {0x11A3, 0x11A7, 2, UNICODE_LBCLASS_AL},
-    {0x11A8, 0x11F9, 2, UNICODE_LBCLASS_JT},
     {0x1801, 0x1801, 2, UNICODE_LBCLASS_AL},
     {0x2010, 0x2010, 2, UNICODE_LBCLASS_BA},
     {0x2013, 0x2013, 2, UNICODE_LBCLASS_BA},
@@ -2029,7 +2019,7 @@ struct unicode_lbprop unicode_lbprop_G_tab[] = {
     {0, 0, 0, 0}
 };
 
-size_t unicode_lbprop_G_len = 102;
+size_t unicode_lbprop_G_len = 97;
 
 struct unicode_lbprop unicode_lbprop_J_tab[] = {
     {0x00A7, 0x00A8, 2, UNICODE_LBCLASS_AL},
@@ -2048,11 +2038,6 @@ struct unicode_lbprop unicode_lbprop_J_tab[] = {
     {0x0401, 0x0401, 2, UNICODE_LBCLASS_AL},
     {0x0410, 0x044F, 2, UNICODE_LBCLASS_AL},
     {0x0451, 0x0451, 2, UNICODE_LBCLASS_AL},
-    {0x115A, 0x115E, 2, UNICODE_LBCLASS_AL},
-    {0x115F, 0x115F, 2, UNICODE_LBCLASS_JL},
-    {0x1160, 0x11A2, 2, UNICODE_LBCLASS_JV},
-    {0x11A3, 0x11A7, 2, UNICODE_LBCLASS_AL},
-    {0x11A8, 0x11F9, 2, UNICODE_LBCLASS_JT},
     {0x2001, 0x2001, 2, UNICODE_LBCLASS_BA},
     {0x2003, 0x2003, 2, UNICODE_LBCLASS_BA},
     {0x2010, 0x2010, 2, UNICODE_LBCLASS_BA},
@@ -2151,7 +2136,7 @@ struct unicode_lbprop unicode_lbprop_J_tab[] = {
     {0, 0, 0, 0}
 };
 
-size_t unicode_lbprop_J_len = 116;
+size_t unicode_lbprop_J_len = 111;
 
 struct unicode_lbprop unicode_lbprop_K_tab[] = {
     {0x00A1, 0x00A1, 2, UNICODE_LBCLASS_OPAL},
@@ -2194,11 +2179,6 @@ struct unicode_lbprop unicode_lbprop_K_tab[] = {
     {0x0401, 0x0401, 2, UNICODE_LBCLASS_AL},
     {0x0410, 0x044F, 2, UNICODE_LBCLASS_AL},
     {0x0451, 0x0451, 2, UNICODE_LBCLASS_AL},
-    {0x115A, 0x115E, 2, UNICODE_LBCLASS_AL},
-    {0x115F, 0x115F, 2, UNICODE_LBCLASS_JL},
-    {0x1160, 0x11A2, 2, UNICODE_LBCLASS_JV},
-    {0x11A3, 0x11A7, 2, UNICODE_LBCLASS_AL},
-    {0x11A8, 0x11F9, 2, UNICODE_LBCLASS_JT},
     {0x2014, 0x2014, 2, UNICODE_LBCLASS_B2},
     {0x2015, 0x2016, 2, UNICODE_LBCLASS_ID},
     {0x2018, 0x2019, 2, UNICODE_LBCLASS_QU},
@@ -2292,7 +2272,7 @@ struct unicode_lbprop unicode_lbprop_K_tab[] = {
     {0, 0, 0, 0}
 };
 
-size_t unicode_lbprop_K_len = 135;
+size_t unicode_lbprop_K_len = 130;
 
 /*
  * UAX #14 Line Breaking Class pair table.

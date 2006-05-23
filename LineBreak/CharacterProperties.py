@@ -36,6 +36,11 @@ def customize(propmap):
 
     ## East Asian Scripts (Han, Hiragana, Katakana, Hangul).
 
+    # Hangul combining jamo are Wide when they aren't combined.
+    for k, v in propmap.items():
+        if v[1] in ('JV', 'JT'):
+            propmap[k] = (2, v[1])
+        
     # Compatibilities between UAX#14 and JIS X 4051.
     # - EM DASH is classified B2 by UAX but ``分離禁止文字'' (inseparable
     #   characters) by JIS.  So vertical form may be IN and narrow form

@@ -33,6 +33,63 @@ enum unicode_lbaction {
 extern const enum unicode_lbaction *unicode_lbpairs[];
 
 /*
+ * Character properties related on line breaking behavior.
+ */
+struct unicode_lbprop
+{
+	unicode_char    range_s;
+	unicode_char    range_e;
+	int             width;        /* UAX#11 East Asian Width */
+	enum unicode_lbclass lbclass; /* UAX#14 Line Breaking Class */
+};
+
+typedef struct unicode_lbprop *(*unicode_lbprop_funcptr)(unicode_char);
+
+/*
+ * Data required by line breaking algorithm.
+ */
+struct unicode_lbinfo
+{
+  int *widths;                      /* character widths */
+  enum unicode_lbclass *lbclasses;  /* line breaking classes */
+  enum unicode_lbaction *lbactions; /* probable line breaking actions */
+  char *charset;                    /* charset context */
+  size_t length;                    /* length of text */
+  int flags;                        /* options to tailor line breaking
+                                       behavior */
+};
+
+/*
+ * Public functions.
+ */
+extern struct unicode_lbinfo
+*unicode_linebreak_alloc(unicode_char *, size_t,
+			 unicode_lbprop_funcptr(*)(const char *, int),
+			 void (*)(unicode_char, int *, enum unicode_lbclass *,
+				  int),
+			 const char *, int);
+
+extern void unicode_linebreak_free(struct unicode_lbinfo *);
+
+extern enum unicode_lbaction
+unicode_linebreak(struct unicode_lbinfo *, unicode_char *,
+		  int (*)(struct unicode_lbinfo *, unicode_char *,
+			  off_t, size_t, int, void *),
+		  void (*)(struct unicode_lbinfo *, unicode_char *,
+			   off_t, size_t, enum unicode_lbaction, void *),
+		  int, void *);
+
+/* Built-in support functions */
+extern unicode_lbprop_funcptr
+unicode_linebreak_find_lbprop_func(const char *, int);
+extern void unicode_linebreak_tailor_lbprop(unicode_char,
+					    int *, enum unicode_lbclass *,
+					    int);
+extern int unicode_linebreak_check_length(struct unicode_lbinfo *,
+					  unicode_char *,
+					  off_t, size_t, int, void* voidarg);
+
+/*
  * Options to tailor line breaking behavior.
  */
 
@@ -49,9 +106,9 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
  * multibyte context.  Set these options to treat such letters always
  * Narrow.
  */
-#define UNICODE_LBOPTION_ALWAYS_NARROW_LATIN     (1<<1)
-#define UNICODE_LBOPTION_ALWAYS_NARROW_GREEK     (1<<2)
-#define UNICODE_LBOPTION_ALWAYS_NARROW_CYRILLIC  (1<<3)
+#define UNICODE_LBOPTION_NARROW_LATIN            (1<<1)
+#define UNICODE_LBOPTION_NARROW_GREEK            (1<<2)
+#define UNICODE_LBOPTION_NARROW_CYRILLIC         (1<<3)
 
 /*
  * Set this to allow break after HY (U+002D HYPHEN-MINUS), before AL.
@@ -79,14 +136,14 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
  * Set this to disable "burasage" (hunging punctuation in East Asian
  * text).
  */
-#define UNICODE_LBOPTION_NO_HUNGING_PUNCT        (1<<8)
+#define UNICODE_LBOPTION_NOHUNG_PUNCT            (1<<8)
 
 /*
  * By default, Wide OP/CL characters are treated as if they are a
  * Narrow character preceded/followed by SP.  Set this to disable
  * such feature.
  */
-#define UNICODE_LBOPTION_WIDE_PUNCT_WITHOUT_GLUE (1<<9)
+#define UNICODE_LBOPTION_NOGLUE_PUNCT            (1<<9)
 
 /*
  * By default, IDEOGRAPHIC SPACE is treated as ID.  Set this to treat
@@ -107,16 +164,21 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
 #define UNICODE_LBOPTION_OPAL_IS_AL              (1<<12)
 
 /*
- * Set this option to treat any of ID, hangul syllables (H2, H3) or
- * hangul combining jamos (JT, JV, JL) as AL.
+ * Set this option to ommit Direct break oppotunities.
  * WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
  */
-#define UNICODE_LBOPTION_FORCE_AL                (1<<13)
+#define UNICODE_LBOPTION_NOBREAK_DIRECT          (1<<13)
+
+/*
+ * Set this option not to combine hangul combining jamos (JT, JV, JL)
+ * when line lengths are determined.
+ */
+#define UNICODE_LBOPTION_NOCOMBINE_HANGUL_JAMO   (1<<14)
 
 /*
  * Set this to break SP+CM sequence. [UAX#14]
  */
-#define UNICODE_LBOPTION_BREAK_SPCM              (1<<14)
+#define UNICODE_LBOPTION_BREAK_SPCM              (1<<15)
 
 /* 
  * Set this option to force break unbreakable text longer than specified
@@ -124,7 +186,7 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
  * This violate line breaking rules then may cause break within words,
  * syllables, characters or on somewhere unpreferred.
  */
-#define UNICODE_LBOPTION_FORCE_LINEWIDTH         (1<<15)
+#define UNICODE_LBOPTION_FORCE_LINEWIDTH         (1<<16)
 
 #define UNICODE_LBOPTION_DEFAULT                 0
 
@@ -134,60 +196,8 @@ extern const enum unicode_lbaction *unicode_lbpairs[];
  *   Following value is the maximum number of octet sequences consisting
  *   character, in 1000 octets terminated by CRLF.  Because, in `legacy'
  *   encodings single character can be assumed occupying 5 octets or less
- *   (6 octets is very rare).  For example: by ISO 2022 encoding scheme,
- *   199 sequences consist of a invokation/designation sequence (3 or 4
- *   octets) and a character sequence (2 or 1 octets; 3 or more are rare),
- *   then at end of line US-ASCII is designated (3 octets), and then CRLF
- *   follows (2 octets).
+ *   (6 octets is very rare).
  */
 #define UNICODE_LINEBREAK_HARD_LIMIT             199
-
-/*
- * Character properties related on line breaking behavior.
- */
-struct unicode_lbprop
-{
-	unicode_char    range_s;
-	unicode_char    range_e;
-	int             width;        /* UAX#11 East Asian Width */
-	enum unicode_lbclass lbclass; /* UAX#14 Line Breaking Class */
-};
-
-typedef struct unicode_lbprop *(*unicode_lbprop_funcptr)(unicode_char);
-
-/*
- * Data required by line breaking algorithm.
- */
-struct unicode_lbinfo
-{
-  int *widths;                      /* character widths */
-  enum unicode_lbclass *lbclasses;  /* line breaking classes */
-  enum unicode_lbaction *lbactions; /* probable line breaking actions */
-  char *charset;                    /* charset context */
-  size_t length;                    /* length of text */
-  int flags;                        /* options to tailor line breaking
-                                       behavior */
-  void *voidarg;                    /* pointer to custom data. */
-};
-
-/*
- * Public functions.
- */
-extern struct unicode_lbinfo
-*unicode_lbinfo_alloc(unicode_char *, size_t,
-                      unicode_lbprop_funcptr(*)(const char *, int),
-                      void (*)(unicode_char, int *, enum unicode_lbclass *,
-			       int),
-                      const char *, int, void *);
-
-extern void unicode_lbinfo_free(struct unicode_lbinfo *);
-
-extern enum unicode_lbaction
-unicode_do_linebreak(struct unicode_lbinfo *, unicode_char *,
-                     int (*)(struct unicode_lbinfo *, unicode_char *,
-			     off_t, size_t, int),
-                     void (*)(struct unicode_lbinfo *, unicode_char *,
-			      off_t, size_t, enum unicode_lbaction),
-                     int);
 
 #endif /* UNICODE_LINEBREAK_H */

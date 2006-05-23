@@ -125,8 +125,6 @@ legacy_widths = {
 
     ## Cyrillic: See below.
 
-    ## Hangul Jamo: See below.
-
     ## Mongolian
     0x1801: { 'G':2,                      }, # MONGOLIAN ELLIPSIS
 
@@ -390,11 +388,6 @@ for u in range(0x0391,0x03A9+1)+range(0x03B1,0x03C9+1):
 for u in [0x0401]+range(0x0410,0x044F+1)+[0x0451]:
     if not legacy_widths.has_key(u): legacy_widths[u] = {}
     for r in ('G', 'J', 'K',    ):
-        legacy_widths[u][r] = 2
-# Hangul Combining Jamo - Wide.
-for u in range(0x115A,0x11F9+1):
-    if not legacy_widths.has_key(u): legacy_widths[u] = {}
-    for r in ('G', 'J', 'K', 'C',):
         legacy_widths[u][r] = 2
 # Roman Numerals - Wide.
 for u in range(0x2160,0x2182+1):

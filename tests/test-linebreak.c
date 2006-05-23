@@ -22,7 +22,8 @@ size_t catutf8(unicode_char **, size_t *, size_t, const char *);
 
 /* Write out one broken line */
 void writeout_cb(struct unicode_lbinfo *lbinfo, unicode_char *text,
-		 off_t start, size_t linelen, enum unicode_lbaction action)
+		 off_t start, size_t linelen, enum unicode_lbaction action,
+		 void *voidarg)
 {
 	printutf8(text+start, linelen);
 
@@ -152,14 +153,14 @@ int main(int argc, char** argv)
 		alloced = catutf8(&text, &textlen, alloced, buf);
 	fclose(ifp);
 
-	if ((lbi = unicode_lbinfo_alloc(text, textlen, NULL, NULL,
-					chset, opt, NULL)) == NULL)
+	if ((lbi = unicode_linebreak_alloc(text, textlen, NULL, NULL,
+					   chset, opt)) == NULL)
 	{
 		if (text != NULL) free(text);
 		exit(0);
 	}
-	switch ((int)unicode_do_linebreak(lbi, text, NULL, &writeout_cb,
-					  maxlen))
+	switch ((int)unicode_linebreak(lbi, text, NULL, &writeout_cb,
+				       maxlen, NULL))
 	{
 	case UNICODE_LBACTION_NOMOD:
 		printf("No breaks or only explicit break(s) occur.\n");
@@ -171,7 +172,7 @@ int main(int argc, char** argv)
 		printf("Direct break(s) occur.\n");
 		break;
 	}
-	unicode_lbinfo_free(lbi);
+	unicode_linebreak_free(lbi);
 
 	free(text);
 	exit(0);

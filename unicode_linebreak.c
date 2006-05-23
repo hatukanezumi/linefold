@@ -17,31 +17,18 @@ static size_t find_linebreak(size_t, enum unicode_lbclass *,
 			     enum unicode_lbaction *, int);
 
 /*
- * NOTICE:
- *   If you want to modify followng functions, don't edit this file.
- *   Otherwise, define new functions externally then call
- *   unicode_lbinfo_alloc() and/or unicode_do_linebreak() with
- *   pointers to such new funtions as arguments.
- */
-static unicode_lbprop_funcptr find_lbprop_func_default(const char *, int);
-static void tailor_lbprop_default(unicode_char, int *, enum unicode_lbclass *,
-				  int);
-static int is_line_exceeded_default(struct unicode_lbinfo *, unicode_char *,
-				    off_t, size_t, int);
-
-/*
  * Public Functions
  */
 
 /* Allocate line break informations. */
 struct unicode_lbinfo
-*unicode_lbinfo_alloc(unicode_char *text, size_t textlen,
-		      unicode_lbprop_funcptr
-		      (*find_lbprop_func)(const char *, int),
-		      void (*tailor_lbprop)(unicode_char,
-					    int *, enum unicode_lbclass *,
-					    int),
-		      const char *chset, int flags, void *voidarg)
+*unicode_linebreak_alloc(unicode_char *text, size_t textlen,
+			 unicode_lbprop_funcptr
+			 (*find_lbprop_func)(const char *, int),
+			 void (*tailor_lbprop)(unicode_char,
+					       int *, enum unicode_lbclass *,
+					       int),
+			 const char *chset, int flags)
 {
   struct unicode_lbinfo *lbinfo;
   int *widths;
@@ -81,9 +68,9 @@ struct unicode_lbinfo
   }
 
   if (find_lbprop_func == NULL)
-    find_lbprop_func = &find_lbprop_func_default;
+    find_lbprop_func = &unicode_linebreak_find_lbprop_func;
   if (tailor_lbprop == NULL)
-    tailor_lbprop = &tailor_lbprop_default;
+    tailor_lbprop = &unicode_linebreak_tailor_lbprop;
 
   lbprop_func = (*find_lbprop_func)(charset, flags);
   for (i=0; i < textlen; i++) {
@@ -108,12 +95,11 @@ struct unicode_lbinfo
   lbinfo->charset = charset;
   lbinfo->length = textlen;
   lbinfo->flags = flags;
-  lbinfo->voidarg = voidarg;
   return lbinfo;
 }
 
 /* Free storage of line break informations. */
-void unicode_lbinfo_free(struct unicode_lbinfo *lbinfo)
+void unicode_linebreak_free(struct unicode_lbinfo *lbinfo)
 {
   if (lbinfo == NULL)
     return;
@@ -127,14 +113,15 @@ void unicode_lbinfo_free(struct unicode_lbinfo *lbinfo)
 
 /* Do line breaking */
 enum unicode_lbaction
-unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
-		     int (*is_line_exceeded)(struct unicode_lbinfo *,
-					     unicode_char *,
-					     off_t, size_t, int),
-		     void (*writeout_cb)(struct unicode_lbinfo *,
-					 unicode_char *,
-					 off_t, size_t, enum unicode_lbaction),
-		     int maxlen)
+unicode_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
+		  int (*is_line_exceeded)(struct unicode_lbinfo *,
+					  unicode_char *,
+					  off_t, size_t, int, void *),
+		  void (*writeout_cb)(struct unicode_lbinfo *,
+				      unicode_char *,
+				      off_t, size_t, enum unicode_lbaction,
+				      void *),
+		  int maxlen, void *voidarg)
 {
   size_t textlen;
   enum unicode_lbaction *lbactions;
@@ -150,7 +137,7 @@ unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
   flags = lbinfo->flags;
 
   if (is_line_exceeded == NULL)
-    is_line_exceeded = &is_line_exceeded_default;
+    is_line_exceeded = &unicode_linebreak_check_length;
 
   while (i < textlen) {
     prevaction = UNICODE_LBACTION_PROHIBITED;
@@ -164,8 +151,12 @@ unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
 	  action == UNICODE_LBACTION_COMBINING_PROHIBITED)
 	/* Prohibited break. */
 	continue;
+      else if ((flags & UNICODE_LBOPTION_NOBREAK_DIRECT) &&
+	       action == UNICODE_LBACTION_DIRECT)
+	/* Ommited Direct break */
+	continue;
       else if ((*is_line_exceeded)(lbinfo, text, linestart, i-linestart+1,
-				   maxlen)) {
+				   maxlen, voidarg)) {
 	/* Line has exceeded the limit. Search previous line breaking
 	   oppotunity. */
 	if (prevaction != UNICODE_LBACTION_PROHIBITED) {
@@ -180,7 +171,7 @@ unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
 	    i--;
 	    if (lbactions[i] != UNICODE_LBACTION_COMBINING_PROHIBITED &&
 		!(*is_line_exceeded)(lbinfo, text, linestart, i-linestart+1,
-				     maxlen))
+				     maxlen, voidarg))
 	      break;
 	  }
 	  action = UNICODE_LBACTION_DIRECT;
@@ -192,7 +183,8 @@ unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
 
 	/* Write out a broken line. */
 	if (writeout_cb != NULL)
-	  (*writeout_cb)(lbinfo, text, linestart, i-linestart+1, action);
+	  (*writeout_cb)(lbinfo, text, linestart, i-linestart+1, action,
+			 voidarg);
 	/* Save line breaking action. */
 	if (action == UNICODE_LBACTION_DIRECT ||
 	    (action == UNICODE_LBACTION_INDIRECT &&
@@ -205,7 +197,8 @@ unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
 		 action == UNICODE_LBACTION_EOT) {
 	/* Explicit break or End of Text. */
 	if (writeout_cb != NULL)
-	  (*writeout_cb)(lbinfo, text, linestart, i-linestart+1, action);
+	  (*writeout_cb)(lbinfo, text, linestart, i-linestart+1, action,
+			 voidarg);
 
         i++;
         break;
@@ -226,8 +219,8 @@ unicode_do_linebreak(struct unicode_lbinfo *lbinfo, unicode_char *text,
 
 /* Internal default of function to find function that get properties of
    a character.  */
-static unicode_lbprop_funcptr find_lbprop_func_default(const char *chset,
-						       int flags)
+unicode_lbprop_funcptr unicode_linebreak_find_lbprop_func(const char *chset,
+							  int flags)
 {
   if (chset == NULL || flags & UNICODE_LBOPTION_GENERIC_WIDTH)
     return &unicode_getprop_generic;
@@ -271,23 +264,24 @@ static unicode_lbprop_funcptr find_lbprop_func_default(const char *chset,
 }
 
 /* Internal default of functin to tailor character property. */
-static void tailor_lbprop_default(unicode_char c,
-				  int *widthptr, enum unicode_lbclass *lbcptr,
-				  int flags)
+void unicode_linebreak_tailor_lbprop(unicode_char c,
+				    int *widthptr,
+				    enum unicode_lbclass *lbcptr,
+				    int flags)
 {
   int width = *widthptr;
   enum unicode_lbclass lbc = *lbcptr;
 
-  if (flags & UNICODE_LBOPTION_ALWAYS_NARROW_LATIN &&
+  if (flags & UNICODE_LBOPTION_NARROW_LATIN &&
       width == 2 &&
       (unicode_char)0x00C0 <= c && c <= (unicode_char)0x01FF &&
       (unicode_char)0x00D7 != c && (unicode_char)0x00F7 != c)
     width = 1;
-  else if (flags & UNICODE_LBOPTION_ALWAYS_NARROW_GREEK &&
+  else if (flags & UNICODE_LBOPTION_NARROW_GREEK &&
       width == 2 &&
       (unicode_char)0x0370 <= c && c <= (unicode_char)0x03FF)
     width = 1;
-  else if (flags & UNICODE_LBOPTION_ALWAYS_NARROW_CYRILLIC &&
+  else if (flags & UNICODE_LBOPTION_NARROW_CYRILLIC &&
       width == 2 &&
       (unicode_char)0x0400 <= c && c <= (unicode_char)0x04FF)
     width = 1;
@@ -313,47 +307,56 @@ static void tailor_lbprop_default(unicode_char c,
     break;
 
 #ifdef UNICODE_LBCLASS_CLH_DEFINED
+#ifdef UNICODE_LBCLASS_CL_DEFINED
   case UNICODE_LBCLASS_CLH:
-    if (flags & UNICODE_LBOPTION_NO_HUNGING_PUNCT)
+    if (flags & UNICODE_LBOPTION_NOHUNG_PUNCT)
       lbc = UNICODE_LBCLASS_CL;
     break;
+#endif
 #endif
 
 #ifdef UNICODE_LBCLASS_CLSP_DEFINED
+#ifdef UNICODE_LBCLASS_CL_DEFINED
   case UNICODE_LBCLASS_CLSP:
-    if (flags & UNICODE_LBOPTION_WIDE_PUNCT_WITHOUT_GLUE)
+    if (flags & UNICODE_LBOPTION_NOGLUE_PUNCT)
       lbc = UNICODE_LBCLASS_CL;
     break;
 #endif
+#endif
 
 #ifdef UNICODE_LBCLASS_CLHSP_DEFINED
+#ifdef UNICODE_LBCLASS_CL_DEFINED
   case UNICODE_LBCLASS_CLHSP:
-    if (flags & UNICODE_LBOPTION_WIDE_PUNCT_WITHOUT_GLUE) {
+    if (flags & UNICODE_LBOPTION_NOGLUE_PUNCT) {
 #  ifdef UNICODE_LBCLASS_CLH_DEFINED
-      if (flags & UNICODE_LBOPTION_NO_HUNGING_PUNCT)
+      if (flags & UNICODE_LBOPTION_NOHUNG_PUNCT)
 	lbc = UNICODE_LBCLASS_CL;
       else
 	lbc = UNICODE_LBCLASS_CLH;
 #  else
       lbc = UNICODE_LBCLASS_CL;
-#  endif /* UNICODE_LBCLASS_CLH_DEFINED */
-    } else if (flags & UNICODE_LBOPTION_NO_HUNGING_PUNCT)
+#  endif
+    } else if (flags & UNICODE_LBOPTION_NOHUNG_PUNCT)
 #  ifdef UNICODE_LBCLASS_CLSP_DEFINED
       lbc = UNICODE_LBCLASS_CLSP;
 #  else
       lbc = UNICODE_LBCLASS_CL;
-#  endif /* UNICODE_LBCLASS_SLCP_DEFINED */
+#  endif
     break;
-#endif /* UNICODE_LBCLASS_CLHSP_DEFINED */
+#endif
+#endif
 
 #ifdef UNICODE_LBCLASS_SPOP_DEFINED
+#ifdef UNICODE_LBCLASS_OP_DEFINED
   case UNICODE_LBCLASS_SPOP:
-    if (flags & UNICODE_LBOPTION_WIDE_PUNCT_WITHOUT_GLUE)
+    if (flags & UNICODE_LBOPTION_NOGLUE_PUNCT)
       lbc = UNICODE_LBCLASS_OP;
     break;
-#endif /* UNICODE_LBCLASS_SPOP_DEFINED */
+#endif
+#endif
 
 #ifdef UNICODE_LBCLASS_BKO_DEFINED
+#ifdef UNICODE_LBCLASS_CM_DEFINED
   case UNICODE_LBCLASS_BKO:
     if (flags & UNICODE_LBOPTION_NOBREAK_VT)
       lbc = UNICODE_LBCLASS_CM;
@@ -361,8 +364,10 @@ static void tailor_lbprop_default(unicode_char c,
       lbc = UNICODE_LBCLASS_BK;
     break;
 #endif
+#endif
 
 #ifdef UNICODE_LBCLASS_IDSP_DEFINED
+#ifdef UNICODE_LBCLASS_ID_DEFINED
   case UNICODE_LBCLASS_IDSP:
     if (flags & UNICODE_LBOPTION_IDSP_IS_SP)
       lbc = UNICODE_LBCLASS_SP;
@@ -370,14 +375,19 @@ static void tailor_lbprop_default(unicode_char c,
       lbc = UNICODE_LBCLASS_ID;
     break;
 #endif
+#endif
 
 #ifdef UNICODE_LBCLASS_NSK_DEFINED
+#ifdef UNICODE_LBCLASS_ID_DEFINED
+#ifdef UNICODE_LBCLASS_NS_DEFINED
   case UNICODE_LBCLASS_NSK:
     if (flags & UNICODE_LBOPTION_RELAX_KANA_NS)
       lbc = UNICODE_LBCLASS_ID;
     else
       lbc = UNICODE_LBCLASS_NS;
     break;
+#endif
+#endif
 #endif
 
 #ifdef UNICODE_LBCLASS_OPAL_DEFINED
@@ -389,32 +399,6 @@ static void tailor_lbprop_default(unicode_char c,
     break;
 #endif
   }
-
-#ifdef UNICODE_LBCLASS_AL_DEFINED
-  switch ((int)lbc) {
-#  ifdef UNICODE_LBCLASS_ID_DEFINED
-  case UNICODE_LBCLASS_ID:
-#  endif /* UNICODE_LBCLASS_ID_DEFINED */
-#  ifdef UNICODE_LBCLASS_H2_DEFINED
-  case UNICODE_LBCLASS_H2:
-#  endif /* UNICODE_LBCLASS_H2_DEFINED */
-#  ifdef UNICODE_LBCLASS_H3_DEFINED
-  case UNICODE_LBCLASS_H3:
-#  endif /* UNICODE_LBCLASS_H3_DEFINED */
-#  ifdef UNICODE_LBCLASS_JL_DEFINED
-  case UNICODE_LBCLASS_JL:
-#  endif /* UNICODE_LBCLASS_JL_DEFINED */
-#  ifdef UNICODE_LBCLASS_JV_DEFINED
-  case UNICODE_LBCLASS_JV:
-#  endif /* UNICODE_LBCLASS_JV_DEFINED */
-#  ifdef UNICODE_LBCLASS_JT_DEFINED
-  case UNICODE_LBCLASS_JT:
-#  endif /* UNICODE_LBCLASS_JT_DEFINED */
-    if (flags & UNICODE_LBOPTION_FORCE_AL)
-      lbc = UNICODE_LBCLASS_AL;
-    break;
-  }
-#endif /* UNICODE_LBCLASS_AL_DEFINED */
 
   *widthptr = width;
   *lbcptr = lbc;
@@ -536,13 +520,15 @@ static size_t find_linebreak(size_t textlen,
 
 /* Internal default of function to check if length of a line exceeds
    limit. */
-static int is_line_exceeded_default(struct unicode_lbinfo *lbinfo,
-				    unicode_char *text,
-				    off_t start, size_t len, int maxlen)
+int unicode_linebreak_check_length(struct unicode_lbinfo *lbinfo,
+				   unicode_char *text,
+				   off_t start, size_t len, int maxlen,
+				   void *voidarg)
 {
   off_t end = start + len;
   int *widths = lbinfo->widths;
   enum unicode_lbclass *lbclasses = lbinfo->lbclasses;
+  int flags = lbinfo->flags;
 
   off_t i;
   int length = 0;
@@ -559,28 +545,34 @@ static int is_line_exceeded_default(struct unicode_lbinfo *lbinfo,
 	case UNICODE_LBCLASS_NL:
 	  break;
 
-#if defined(UNICODE_LBCLASS_JL_DEFINED) && defined(UNICODE_LBCLASS_JV_DEFINED) && defined(UNICODE_LBCLASS_JT_DEFINED)
+#ifdef UNICODE_LBCLASS_JL_DEFINED
+#ifdef UNICODE_LBCLASS_JV_DEFINED
+#ifdef UNICODE_LBCLASS_JT_DEFINED
 	/* Convention for Hangul combining jamo.
 	 * choseong+jungseong or choseong+jungseong+jongseong
 	 * is single Wide character.
 	 */
 	case UNICODE_LBCLASS_JV:
-	  if (i >= start+1 && lbclasses[i-1] == UNICODE_LBCLASS_JL)
+	  if (!(flags & UNICODE_LBOPTION_NOCOMBINE_HANGUL_JAMO) &&
+	      i >= start+1 && lbclasses[i-1] == UNICODE_LBCLASS_JL)
 	    real_length -= widths[i];
 	  else
 	    length += widths[i];
 	  break;
 
 	case UNICODE_LBCLASS_JT:
-	  if (i >= start+2 && lbclasses[i-2] == UNICODE_LBCLASS_JL &&
+	  if (!(flags & UNICODE_LBOPTION_NOCOMBINE_HANGUL_JAMO) &&
+	      i >= start+2 && lbclasses[i-2] == UNICODE_LBCLASS_JL &&
 	      lbclasses[i-1] == UNICODE_LBCLASS_JV)
 	    real_length -= widths[i];
 	  else
 	    length += widths[i];
 	  break;
 #endif
+#endif
+#endif
 
-#if defined(UNICODE_LBCLASS_CLH_DEFINED) || defined(UNICODE_LBCLASS_CLHSP)
+#if defined(UNICODE_LBCLASS_CLH_DEFINED) || defined(UNICODE_LBCLASS_CLHSP_DEFINED)
 #  ifdef UNICODE_LBCLASS_CLH_DEFINED
 	case UNICODE_LBCLASS_CLH:
 #  endif
