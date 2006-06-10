@@ -40,6 +40,7 @@ def readunidata(fp):
     return ret
 
 def printpropmap(fp, propmap, classes):
+    num4 = num2 = num1 = None
     num = 0
 
     keys = propmap.keys()
@@ -52,21 +53,39 @@ def printpropmap(fp, propmap, classes):
             s = (k, v)
             e = (k, v)
             continue
-        if e[0]+1 == k and e[1] == v:
+        elif e[0] <= 0xFF and k >= 0x100:
+            num1 = num + 1
+        elif e[0] <= 0xFFFF and k >= 0x10000:
+            num2 = num + 1
+        elif e[0]+1 == k and e[1] == v:
             e = (k, v)
             continue
-        print >>fp, '    {0x%04X, 0x%04X, %d, UNICODE_LBCLASS_%s},' % \
+        print >>fp, '    {0x%04X, 0x%04X, %d, LINEFOLD_CLASS_%s},' % \
               (s[0], e[0], s[1][0], s[1][1])
+        if e[0] <= 0xFF and k >= 0x100:
+            print >>fp, '#if SIZEOF_UNICODE_CHAR > 1'
+        elif e[0] <= 0xFFFF and k >= 0x10000:
+            print >>fp, '#if SIZEOF_UNICODE_CHAR > 2'
         if not s[1][1] in classes: classes.append(s[1][1])
         s = (k, v)
         e = (k, v)
         num += 1
     if s is not None:
-        print >>fp, '    {0x%04X, 0x%04X, %d, UNICODE_LBCLASS_%s},' % \
+        print >>fp, '    {0x%04X, 0x%04X, %d, LINEFOLD_CLASS_%s},' % \
               (s[0], e[0], s[1][0], s[1][1])
         if not s[1][1] in classes: classes.append(s[1][1])
         num += 1
-    return num
+    if num4 is None:
+        num4 = num
+    if num2 is None:
+        num2 = num
+    else:
+        print >>fp, '#endif /* SIZEOF_UNICODE_CHAR > 2 */'
+    if num1 is None:
+        num1 = num
+    else:
+        print >>fp, '#endif /* SIZEOF_UNICODE_CHAR > 1 */'
+    return num4, num2, num1
 
 def generate_lbclass_pair(classes, lbrules):
     table = {}
@@ -154,7 +173,7 @@ def generate_lbclass_pair(classes, lbrules):
 
 def printpairtable(fp, classes, table, rulemap):
     for before in classes:
-        fp.write('static const enum unicode_lbaction row_%s[] =\n  {' % before)
+        fp.write('static const linefold_action row_%s[] =\n  {' % before)
         for after in classes:
             r = table[before][after]
             if r == DIRECT:
@@ -173,7 +192,7 @@ def printpairtable(fp, classes, table, rulemap):
                 fp.write(',')
         fp.write('};\n')
     print >>fp, '''
-const enum unicode_lbaction *unicode_lbpairs[] = 
+const linefold_action *linefold_lbpairs[] = 
 {
   %s
 };

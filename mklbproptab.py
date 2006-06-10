@@ -2,7 +2,7 @@
 #-*- coding: utf-8 -*-
 
 """
-mklbproptab.py - Generate unicode_linebreaktab.c & unicode_linebreaktab.h
+mklbproptab.py - Generate linefoldtab.c & linefoldtab.h
 
 Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
 redistributed under GNU General Public License version 2 (or later
@@ -45,8 +45,8 @@ from LineBreak.Utils import *
 LINEBREAK = 'LineBreak.txt'
 EASTASIANWIDTH = 'EastAsianWidth.txt'
 # Files to output.
-LBPROPTAB = 'unicode_linebreaktab.c'
-LBPROPHEADER = 'unicode_linebreaktab.h'
+LBPROPTAB = 'linefoldtab.c'
+LBPROPHEADER = 'linefoldtab.h'
 LBRULEHTML = 'linebreakrule.html'
 
 # My name.
@@ -122,11 +122,23 @@ allclasses = []
 fp = file(LBPROPTAB, 'w')
 print >>fp, """\
 /*
- * CAUTION: Don't edit this file manually.  To update this file, read
+ * NOTICE: Don't edit this file manually.  To update this file, read
  * %(myname)s.
  */
 
-#include "unicode_linebreak.h"
+#include "common.h"
+#include "linefold.h"
+
+/*
+ * Character properties related on line breaking behavior.
+ */
+typedef struct
+{
+	unicode_char    range_s;
+	unicode_char    range_e;
+	int             width;        /* UAX#11 East Asian Width */
+	linefold_class lbclass; /* UAX#14 Line Breaking Class */
+} lbprop;
 
 /*
  * Unicode Character Property Table
@@ -134,32 +146,46 @@ print >>fp, """\
 """ % { 'myname': MYNAME }
 
 # Write generic property map.
-print >>fp, "struct unicode_lbprop unicode_lbprop_tab[] = {"
-num = printpropmap(fp, propmap, allclasses)
+print >>fp, "static lbprop lbprop_tab[] = {"
+num4, num2, num1 = printpropmap(fp, propmap, allclasses)
 print >>fp, """\
-    {0x20000, 0x2FFFD, 2, UNICODE_LBCLASS_ID},   /* Supplemental Ideographs */
-    {0x30000, 0x3FFFD, 2, UNICODE_LBCLASS_ID},   /* Ideographs in the future */
-    {0xE0000, 0xE01EF, 0, UNICODE_LBCLASS_CM},   /* Tags */
-    {0xF0000, 0xFFFFD, 1, UNICODE_LBCLASS_AL},   /* Plane 15 Private Use */
-    {0x100000, 0x10FFFD, 1, UNICODE_LBCLASS_AL}, /* Plane 16 Private Use */
+#if SIZEOF_UNICODE_CHAR > 2
+    {0x20000, 0x2FFFD, 2, LINEFOLD_CLASS_ID},   /* Supplemental Ideographs */
+    {0x30000, 0x3FFFD, 2, LINEFOLD_CLASS_ID},   /* Ideographs in the future */
+    {0xE0000, 0xE01EF, 0, LINEFOLD_CLASS_CM},   /* Tags */
+    {0xF0000, 0xFFFFD, 1, LINEFOLD_CLASS_AL},   /* Plane 15 Private Use */
+    {0x100000, 0x10FFFD, 1, LINEFOLD_CLASS_AL}, /* Plane 16 Private Use */
+#endif /* SIZEOF_UNICODE_CHAR > 2 */
     {0, 0, 0, 0}
 };
 
-size_t unicode_lbprop_len = %d;
-""" % (num+5)
+#if SIZEOF_UNICODE_CHAR > 2
+static size_t lbprop_len = %d;
+#elif SIZEOF_UNICODE_CHAR > 1
+static size_t lbprop_len = %d;
+#else
+static size_t lbprop_len = %d;
+#endif /* SIZEOF_UNICODE_CHAR */
+""" % (num4+5, num2, num1)
 
 ## Write property maps with custom widths.
 lmkeys = legacy_maps.keys()
 lmkeys.sort()
 for r in lmkeys:
-    print >>fp, "struct unicode_lbprop unicode_lbprop_%s_tab[] = {" % r
-    num = printpropmap(fp, legacy_maps[r], allclasses)
+    print >>fp, "static lbprop lbprop_%s_tab[] = {" % r
+    num4, num2, num1 = printpropmap(fp, legacy_maps[r], allclasses)
     print >>fp, """\
     {0, 0, 0, 0}
 };
 
-size_t unicode_lbprop_%s_len = %d;
-""" % (r, num)
+#if SIZEOF_UNICODE_CHAR > 2
+static size_t lbprop_%(r)s_len = %(num4)d;
+#elif SIZEOF_UNICODE_CHAR > 1
+static size_t lbprop_%(r)s_len = %(num2)d;
+#else
+static size_t lbprop_%(r)s_len = %(num1)d;
+#endif /* SIZEOF_UNICODE_CHAR */
+""" % {'r': r, 'num4': num4, 'num2': num2, 'num1': num1,}
 
 ## Generate line breaking class pair table and write it.
 print >>fp, """\
@@ -167,11 +193,11 @@ print >>fp, """\
  * UAX #14 Line Breaking Class pair table.
  */
 
-#define X  UNICODE_LBACTION_PROHIBITED
-#define Xc UNICODE_LBACTION_COMBINING_PROHIBITED
-#define Ic UNICODE_LBACTION_COMBINING_INDIRECT
-#define I  UNICODE_LBACTION_INDIRECT
-#define D  UNICODE_LBACTION_DIRECT
+#define X  LINEFOLD_ACTION_PROHIBITED
+#define Xc LINEFOLD_ACTION_COMBINING_PROHIBITED
+#define Ic LINEFOLD_ACTION_COMBINING_INDIRECT
+#define I  LINEFOLD_ACTION_INDIRECT
+#define D  LINEFOLD_ACTION_DIRECT
 """
 table, rulemap = generate_lbclass_pair(ORDINAL_CLASSES, LINE_BREAKING_RULES)
 printpairtable(fp, ORDINAL_CLASSES, table, rulemap)
@@ -181,17 +207,16 @@ print >>fp, """\
  * Functions to get property
  */
 
-static struct unicode_lbprop unicode_lbprop_unknown[1] =
+static lbprop lbprop_unknown[1] =
 {
-	{0, 0, 1, UNICODE_LBCLASS_AL}
+	{0, 0, 1, LINEFOLD_CLASS_AL}
 };
 
-static struct unicode_lbprop *find_lbprop(struct unicode_lbprop *t,
-					  size_t n, unicode_char c)
+static lbprop *find_lbprop(lbprop *t, size_t n, unicode_char c)
 {
-	struct unicode_lbprop *top = t;
-	struct unicode_lbprop *bot = t + n - 1;
-	struct unicode_lbprop *cur;
+	lbprop *top = t;
+	lbprop *bot = t + n - 1;
+	lbprop *cur;
 	
 	while (top <= bot)
 	{
@@ -207,26 +232,31 @@ static struct unicode_lbprop *find_lbprop(struct unicode_lbprop *t,
 }
 
 /* Generic */
-struct unicode_lbprop *unicode_getprop_generic(unicode_char c)
+void linefold_getprop_generic(unicode_char c,
+			      int *widthptr, linefold_class *lbcptr)
 {
-	struct unicode_lbprop *ucp;
-	if ((ucp = find_lbprop(unicode_lbprop_tab,
-			       unicode_lbprop_len, c)) == NULL)
-		ucp = unicode_lbprop_unknown;
-	return ucp;
+	lbprop *ucp;
+	if ((ucp = find_lbprop(lbprop_tab, lbprop_len, c)) == NULL)
+		ucp = lbprop_unknown;
+	if (widthptr)
+		*widthptr = ucp->width;
+	if (lbcptr)
+		*lbcptr = ucp->lbclass;
 }
 """
 for r in lmkeys:
     print >>fp, """\
-struct unicode_lbprop *unicode_getprop_%(region)s(unicode_char c)
+void linefold_getprop_%(region)s(unicode_char c,
+			int *widthptr, linefold_class *lbcptr)
 {
-	struct unicode_lbprop *ucp;
-	if ((ucp=find_lbprop(unicode_lbprop_%(region)s_tab,
-			     unicode_lbprop_%(region)s_len, c)) == NULL &&
-	    (ucp=find_lbprop(unicode_lbprop_tab,
-			     unicode_lbprop_len, c)) == NULL)
-		ucp = unicode_lbprop_unknown;
-	return ucp;
+	lbprop *ucp;
+	if ((ucp=find_lbprop(lbprop_%(region)s_tab, lbprop_%(region)s_len, c)) == NULL &&
+	    (ucp=find_lbprop(lbprop_tab, lbprop_len, c)) == NULL)
+		ucp = lbprop_unknown;
+	if (widthptr)
+		*widthptr = ucp->width;
+	if (lbcptr)
+		*lbcptr = ucp->lbclass;
 }
 """ % { 'region': r }
 
@@ -237,71 +267,75 @@ fp = file(LBPROPHEADER, 'w')
 allclasses.sort()
 print >>fp, """\
 /*
- * CAUTION: Don't edit this file manually.  To update this file, read
+ * NOTICE: Don't edit this file manually.  To update this file, read
  * %(myname)s.
  */
 
-#ifndef UNICODE_LINEBREAKTAB_H
-#define UNICODE_LINEBREAKTAB_H
+#ifndef LINEFOLDTAB_H
+#define LINEFOLDTAB_H
 
 /*
  * UAX#14 Line Breaking Classes.
  */
 
-enum unicode_lbclass
-{
-  /*
-   * Classes appear in unicode_lbpairs[][] table.
-   * NOTE: Order is important.
-   */
 """ % { 'myname': MYNAME }
 
-initzero = ' = 0'
-for c in ORDINAL_CLASSES:
-    fp.write("  UNICODE_LBCLASS_%s%s" % (c, initzero))
-    if initzero: initzero = ''
-    fp.write(',\n')
+idx = 0
 print >>fp, """\
-  /* Placeholder to indicate end of ordinal classes. */
-  UNICODE_LBCLASS_TABLESIZE,
-
-  /*
-   * Below from here shouldn't appear in unicode_lbpairs[][] table.
-   */
-
-  /* SPACE */
-  UNICODE_LBCLASS_SP,
-
-  /* Explicit break. */
-  %s,
-
-  /*
-   * Custom classes.  These should be solved to any of classes above
-   * by tailor_lbclass().
-   */
-
-  %s
-};
-""" % (
-    ',\n  '.join(['UNICODE_LBCLASS_'+c for c in EXPLICIT_BREAK_CLASSES]),
-    ',\n  '.join(['UNICODE_LBCLASS_'+c for c in allclasses
-                  if not c in ORDINAL_CLASSES+EXPLICIT_BREAK_CLASSES+['SP']]),
-)
+/*
+ * Classes appear in linefold_lbpairs[][] table.
+ * NOTE: Order is important.
+ */
+"""
 for c in ORDINAL_CLASSES:
-    print >>fp, "#define UNICODE_LBCLASS_%s_DEFINED" % c
-for c in allclasses:
-    if not c in ORDINAL_CLASSES+EXPLICIT_BREAK_CLASSES+['SP']:
-        print >>fp, "#define UNICODE_LBCLASS_%s_DEFINED" % c
+    print >>fp, "#define LINEFOLD_CLASS_%s %d" % (c, idx)
+    idx += 1
 print >>fp, ""
 
 print >>fp, """\
-extern struct unicode_lbprop *unicode_getprop_generic(unicode_char);"""
+/* Placeholder to indicate end of ordinal classes. */
+#define LINEFOLD_CLASS_TABLESIZE %d
+""" % idx
+
+print >>fp, """\
+/*
+ * Below from here shouldn't appear in linefold_lbpairs[][] table.
+ */
+
+/* SPACE */
+#define LINEFOLD_CLASS_SP %d
+""" % idx
+idx += 1
+print >>fp, ""
+
+print >>fp, """\
+/* Explicit break. */
+"""
+for c in EXPLICIT_BREAK_CLASSES:
+    print >>fp, "#define LINEFOLD_CLASS_%s %d" % (c, idx)
+    idx += 1
+print >>fp, ""
+
+print >>fp, """\
+/*
+ * Custom classes.  These should be solved to any of classes above
+ * by tailor_lbclass().
+ */
+"""
+for c in [c for c in allclasses
+          if not c in ORDINAL_CLASSES+EXPLICIT_BREAK_CLASSES+['SP']]:
+    print >>fp, "#define LINEFOLD_CLASS_%s %d" % (c, idx)
+    idx += 1
+print >>fp, ""
+
+print >>fp, """\
+extern void linefold_getprop_generic(unicode_char, int *, linefold_class *);"""
 for r in lmkeys:
     print >>fp, """\
-extern struct unicode_lbprop *unicode_getprop_%(region)s(unicode_char);""" % \
+extern void linefold_getprop_%(region)s(unicode_char, int *, linefold_class *);""" % \
 { 'region': r }
 print >>fp, ''
-print >>fp, '#endif /* UNICODE_LINEBREAKTAB_H */'
+print >>fp, '#endif /* LINEFOLDTAB_H */'
 fp.close()
 
 ## Write HTML pair table.

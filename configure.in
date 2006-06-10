@@ -1,0 +1,278 @@
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.59)
+AC_INIT(linefold, 1.0alpha0, hatuka@nezumi.nu)
+LPATH="$PATH:/usr/local/bin"
+
+AM_INIT_AUTOMAKE(linefold, 1.0alpha0, 0)
+AC_CONFIG_HEADER([config.h])
+
+# Checks for programs.
+AC_PROG_MAKE_SET
+AM_PROG_LIBTOOL
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_CC
+#AC_PROG_RANLIB
+AC_PATH_PROGS(PYTHON, python2 python, python, $LPATH)
+if test "$PYTHON" = "python"
+then
+	AC_MSG_RESULT(Python not found.  You won't be able to customize line breaking properties and rules.)
+fi
+AM_CONDITIONAL(USE_PYTHON, [test "$PYTHON" != "python"])
+
+# Checks for libraries.
+#AM_ICONV
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([locale.h stdlib.h string.h strings.h wchar.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_SIZE_T
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([setlocale strcasecmp strdup])
+
+# Sizes of common basic types
+AC_CHECK_SIZEOF(long, 4)
+AC_CHECK_SIZEOF(short, 2)
+
+# check for wchar.h
+AC_CHECK_HEADER(wchar.h, [
+  AC_DEFINE(HAVE_WCHAR_H, 1,
+  [Define if the compiler provides a wchar.h header file.])
+  wchar_h="yes"
+],
+wchar_h="no"
+)
+
+# determine wchar_t size
+if test "$wchar_h" = yes
+then
+  AC_CHECK_SIZEOF(wchar_t, 4, [#include <wchar.h>])
+fi
+
+# determine type of unicode_char
+AC_MSG_CHECKING(what type to use for unicode)
+AC_ARG_ENABLE(unicode,
+  AC_HELP_STRING(--enable-unicode@<:@=wchar_t|ucs4|ucs2@:>@,
+  Enable Unicode strings (default is yes)),
+  [],
+  [enable_unicode=yes])
+
+if test $enable_unicode = yes
+then
+  if test "$wchar_h" = "yes"
+  then
+    enable_unicode="wchar_t"
+  else
+    enable_unicode="ucs4"
+  fi
+fi
+
+AH_TEMPLATE(SIZEOF_UNICODE_CHAR,
+  [Define as the size of the unicode type.])
+case "$enable_unicode" in
+ucs2)
+  unicode_size="2"
+  AC_DEFINE(SIZEOF_UNICODE_CHAR,2)
+  ;;
+ucs4)
+  unicode_size="4"
+  AC_DEFINE(SIZEOF_UNICODE_CHAR,4)
+  ;;
+wchar_t)
+  unicode_size="$ac_cv_sizeof_wchar_t"
+  AC_DEFINE_UNQUOTED(SIZEOF_UNICODE_CHAR,$ac_cv_sizeof_wchar_t)
+  ;;
+*)
+  unicode_size="1"
+  AC_DEFINE(SIZEOF_UNICODE_CHAR,1)
+  ;;
+esac
+
+if test "$enable_unicode" = "no"
+then
+  UNICODE_TYPE="unsigned char"
+  AC_MSG_RESULT(not used)
+else
+  AC_DEFINE(HAVE_UNICODE, 1,
+  [Define if you want to have a Unicode type.])
+  if test "$unicode_size" = "$ac_cv_sizeof_wchar_t"
+  then
+    UNICODE_TYPE="wchar_t"
+    AC_DEFINE(HAVE_USABLE_WCHAR_T, 1,
+    [Define if you have a useable wchar_t type defined in wchar.h.])
+  elif test "$ac_cv_sizeof_short" = "$unicode_size"
+  then
+    UNICODE_TYPE="unsigned short"
+  elif test "$ac_cv_sizeof_long" = "$unicode_size"
+  then
+    UNICODE_TYPE="unsigned long"
+  else
+    AC_MSG_ERROR(no type found.)
+  fi
+  AC_MSG_RESULT($UNICODE_TYPE)
+fi
+
+AC_SUBST(UNICODE_TYPE)
+
+# Check for endians
+AC_C_BIGENDIAN
+if test $ac_cv_c_bigendian = "yes"
+then
+    endian_suffix="BE"
+else
+    endian_suffix="LE"
+fi
+
+# Check libiconv
+AC_ARG_WITH(libiconv,
+[  --with-libiconv@<:@=DIR@:>@   Specify where libiconv is installed (DIR is path
+                          to libiconv install dir (prefix)).],
+    with_libiconv=$withval,with_libiconv='no')
+AC_CHECKING(where libiconv is installed)
+if test "$with_libiconv" != "no"
+then
+  ICONV_LIBDIR="$with_libiconv/lib"
+  ICONV_INCDIR="$with_libiconv/include"
+  AC_CHECK_LIB(c, iconv_open, ICONV_LIB="-L$ICONV_LIBDIR -lc",,"-L$ICONV_LIBDIR")
+  AC_CHECK_LIB(iconv, iconv_open, ICONV_LIB="-L$ICONV_LIBDIR -liconv",,"-L$ICONV_LIBDIR")
+fi
+if test -n "$ICONV_LIB"
+then
+  if test -n "$ICONV_INCDIR"
+  then
+    ICONV_INC="-I$ICONV_INCDIR"
+    CFLAGS="$ICONV_INC $CFLAGS"
+    CPPFLAGS="$ICONV_INC $CPPFLAGS"
+  fi
+  AC_MSG_RESULT([$ICONV_LIB])
+else
+  AC_CHECK_LIB(c, iconv_open, ICONV_LIB="-lc",,)
+  AC_CHECK_LIB(iconv, iconv_open, ICONV_LIB="-liconv",,)        
+  if test -n "$ICONV_LIB"
+  then
+    AC_MSG_RESULT([$ICONV_LIB])
+  else
+    AC_MSG_RESULT([not found.])
+  fi
+fi
+AC_SUBST(ICONV_LIB)
+
+# Determine internal Unicode charset.
+if test -n "$ICONV_LIB"
+then
+    AC_CHECKING(which charset is used for internal Unicode)
+    changequote(,)
+    cat > conftest.c <<EOF
+#include <stdio.h>
+#include <iconv.h>
+
+#define SIZEOF_UNICODE_CHAR ${unicode_size}
+#define ENDIAN_SUFFIX "${endian_suffix}"
+
+const char *internal_charset[] = {
+#if SIZEOF_UNICODE_CHAR == 2
+  "UTF-16" ENDIAN_SUFFIX,
+  "UTF16" ENDIAN_SUFFIX,
+#else
+  "UCS-4-INTERNAL", /* GNU libiconv, FreeBSD, APR */
+  "UCS-4" ENDIAN_SUFFIX, /* SunOS */
+  "UCS-4", /* GLIBC */
+#endif
+  NULL
+};
+
+int main()
+{
+  int i=0;
+  iconv_t ic;
+
+  while (internal_charset[i]) {
+    ic = iconv_open("ASCII", internal_charset[i]);
+    if (ic != (iconv_t)(-1)) {
+      printf("%s\n", internal_charset[i]);
+      return 0;
+    }
+    i++;
+  }
+  printf("unknown\n");
+  return 0;
+}
+EOF
+    changequote([, ])
+    $CC $CFLAGS $ICONV_LIB $LDFLAGS -o conftest.out conftest.c
+    internal_charset=`./conftest.out`
+    AC_MSG_RESULT($internal_charset)
+    if test "$internal_charset" = "unknown"
+    then
+        AC_MSG_ERROR([Cannot determine internal Unicode charset.])
+    fi
+    AC_DEFINE_UNQUOTED(INTERNAL_UNICODE_CHARSET,"$internal_charset",
+              [Internal charset to handle Unicode.])
+fi
+
+AC_ARG_ENABLE(bin,
+  [  --disable-bin        Disable binary executable],
+  [],
+  [enable_bin=yes])
+if test "$enable_unicode" = "no" -o -z "$ICONV_LIB"
+then
+  enable_bin="no"
+fi
+
+AM_CONDITIONAL(ENABLE_BIN, [test "$enable_bin" = "yes"])
+if test "$enable_bin" = "no"
+then
+  AC_MSG_RESULT(Binary executable won't be built.)
+else
+  # Check libcharset and langinfo(CODESET)
+  if test "$ac_cv_func_setlocale" = "yes"
+  then
+    AC_ARG_WITH(libcharset,
+            [  --with-libcharset@<:@=DIR@:>@ Use the libcharset library],
+            with_libcharset=$withval,
+            with_libcharset=no)
+    AM_LANGINFO_CODESET
+    if test "$with_libcharset" != "no" -o "$am_cv_langinfo_codeset" = "no"
+    then
+      if test "$with_libcharset" = "yes" -o "$with_libcharset" = "no"
+      then
+        if test -n "$ICONV_LIBDIR"
+        then
+          CHARSET_LIBDIR="$ICONV_LIBDIR"
+          CHARSET_INCDIR="$ICONV_INCDIR"
+        fi
+      else
+        CHARSET_LIBDIR="$with_libcharset/lib"
+        CHARSET_INCDIR="$with_libcharset/include"
+      fi
+      AC_CHECK_LIB(charset,locale_charset,CHARSET_LIB="-L$CHARSET_LIBIDR -lcharset",,"-L$CHARSET_LIBDIR")
+      if test "$ac_cv_lib_charset_locale_charset" = "yes"; then
+        if test -n "$CHARSET_INCDIR"
+        then
+          CHARSET_INC="-I$CHARSET_INCDIR"
+        fi
+        CFLAGS="$CHARSET_INC $CFLAGS"
+        CPPFLAGS="$CHARSET_INC $CPPFLAGS"
+        AC_CHECK_HEADERS([localcharset.h libcharset.h])
+      else
+        AC_MSG_ERROR([libcharset was not found.  Install libcharset package.])
+      fi
+      AC_DEFINE_UNQUOTED(USE_LIBCHARSET, 1,
+            [ Set this to 1 to use libcharset library. ])
+    fi
+    AC_MSG_CHECKING([whether libcharset is used])
+    AC_MSG_RESULT($with_libcharset)
+  else
+    AC_MSG_RESULT(Locale based conversion feature disabled.)
+  fi
+fi
+AC_SUBST(CHARSET_LIB)
+
+AC_CONFIG_FILES(Makefile include/linefold.h)
+AC_OUTPUT

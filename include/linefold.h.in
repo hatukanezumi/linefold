@@ -1,0 +1,192 @@
+/*
+ * An implementation of line breaking algorithm described in
+ * Unicode Standard Annex #14 (UAX#14).
+ *
+ * Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
+ * redistributed under GNU General Public License version 2 (or later
+ * version you prefer).
+ * 
+ * $Id$
+ */
+
+#ifndef LINEFOLD_H
+#define LINEFOLD_H
+
+typedef @UNICODE_TYPE@ unicode_char;
+typedef int linefold_class;
+
+#include "linefoldtab.h"
+
+/*
+ * Line Breaking Actions.
+ * [*] may be feed to callback funtion by linefold().
+ */
+typedef enum {
+	LINEFOLD_ACTION_PROHIBITED=0,         /* Prohibited Break */
+	LINEFOLD_ACTION_COMBINING_PROHIBITED, /* Prohibited Break for CM */
+	LINEFOLD_ACTION_COMBINING_INDIRECT,   /* Indirect Break for CM */
+	LINEFOLD_ACTION_INDIRECT,             /* Indirect Break [*] */
+	LINEFOLD_ACTION_DIRECT,               /* Direct Break [*] */
+	LINEFOLD_ACTION_EXPLICIT,             /* Explicit Break [*] */
+	LINEFOLD_ACTION_EOT                   /* End of Text [*] */
+} linefold_action;
+#define LINEFOLD_ACTION_NOMOD LINEFOLD_ACTION_PROHIBITED
+
+extern const linefold_action *linefold_lbpairs[];
+
+typedef void (*linefold_lbprop_funcptr)(unicode_char, int *, linefold_class *);
+
+/*
+ * Data required by line breaking algorithm.
+ */
+struct linefold_info
+{
+  int *widths;                      /* character widths */
+  linefold_class *lbclasses;  /* line breaking classes */
+  linefold_action *lbactions; /* probable line breaking actions */
+  char *charset;                    /* charset context */
+  size_t length;                    /* length of text */
+  int flags;                        /* options to tailor line breaking
+                                       behavior */
+};
+
+/*
+ * Public functions.
+ */
+extern struct linefold_info
+*linefold_alloc(unicode_char *, size_t,
+		linefold_lbprop_funcptr(*)(const char *, int),
+		void (*)(unicode_char, int *, linefold_class *, int),
+		const char *, int);
+
+extern void linefold_free(struct linefold_info *);
+
+extern linefold_action
+linefold(struct linefold_info *, unicode_char *,
+		  int (*)(struct linefold_info *, unicode_char *,
+			  size_t, size_t, int, void *),
+		  void (*)(struct linefold_info *, unicode_char *,
+			   size_t, size_t, linefold_action, void *),
+		  int, void *);
+
+/* Built-in support functions */
+extern linefold_lbprop_funcptr
+linefold_find_lbprop_func(const char *, int);
+extern void
+linefold_tailor_lbprop(unicode_char, int *, linefold_class *, int);
+extern int
+linefold_check_length(struct linefold_info *, unicode_char *, size_t, size_t,
+		      int, void* voidarg);
+
+/*
+ * Options to tailor line breaking behavior.
+ */
+
+/*
+ * Resolve character width within generic (Unicode) context, even if
+ * character set context was specified.
+ */
+#define LINEFOLD_OPTION_GENERIC_WIDTH           1
+
+/*
+ * By default, in multibyte character set context, several Latin, Greek
+ * or Cyrillic letters are treated as Wide.  In some display
+ * enviroments they are usually rendered as Narrow, even if in
+ * multibyte context.  Set these options to treat such letters always
+ * Narrow.
+ */
+#define LINEFOLD_OPTION_NARROW_LATIN            (1<<1)
+#define LINEFOLD_OPTION_NARROW_GREEK            (1<<2)
+#define LINEFOLD_OPTION_NARROW_CYRILLIC         (1<<3)
+
+/*
+ * Set this to allow break after HY (U+002D HYPHEN-MINUS), before AL.
+ * By default, breaking directly before AL is not allowed.
+ */
+#define LINEFOLD_OPTION_BREAK_HY                (1<<4)
+
+/*
+ * Set this to allow break after U+00AD SOFT HYPHEN.  By default, breaking
+ * directly after soft hyphen is not allowed.
+ */
+#define LINEFOLD_OPTION_BREAK_SOFT_HYPHEN       (1<<5)
+
+/*
+ * Set this to treat U+0085 NEL as CM, not BK. [UAX#14]
+ */
+#define LINEFOLD_OPTION_NOBREAK_NL              (1<<6)
+
+/*
+ * Set this to treat U+000B vertical tab as CM, not BK. [UAX#14]
+ */
+#define LINEFOLD_OPTION_NOBREAK_VT              (1<<7)
+
+/*
+ * Set this to disable "burasage" (hunging punctuation in East Asian
+ * text).
+ */
+#define LINEFOLD_OPTION_NOHUNG_PUNCT            (1<<8)
+
+/*
+ * By default, Wide OP/CL characters are treated as if they are a
+ * Narrow character preceded/followed by SP.  Set this to disable
+ * such feature.
+ */
+#define LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<9)
+
+/*
+ * By default, IDEOGRAPHIC SPACE is treated as ID.  Set this to treat
+ * it as SP.
+ */
+#define LINEFOLD_OPTION_IDSP_IS_SP              (1<<10)
+
+/*
+ * By default, small hiragana/katakana and KATAKANA-HIRAGANA PROLONGED
+ * SIGN are NS.  Set this to treat these characters as ID. [JIS X 4051]
+ */
+#define LINEFOLD_OPTION_RELAX_KANA_NS           (1<<11)
+
+/*
+ * Set this to treat spanish quotations INVERTED EXCLAMATION MARK and
+ * INVERTED QUESTION MARK as AL, not OP. [UAX#14]
+ */
+#define LINEFOLD_OPTION_OPAL_IS_AL              (1<<12)
+
+/*
+ * Set this option to ommit Direct break oppotunities.
+ * WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
+ */
+#define LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<13)
+
+/*
+ * Set this option not to combine hangul combining jamos (JT, JV, JL)
+ * when line lengths are determined.
+ */
+#define LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<14)
+
+/*
+ * Set this to break SP+CM sequence. [UAX#14]
+ */
+#define LINEFOLD_OPTION_BREAK_SPCM              (1<<15)
+
+/* 
+ * Set this option to force break unbreakable text longer than specified
+ + width.  By default, longer text won't be broken.
+ * This violate line breaking rules then may cause break within words,
+ * syllables, characters or on somewhere unpreferred.
+ */
+#define LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<16)
+
+#define LINEFOLD_OPTION_DEFAULT                 0
+
+/*
+ * Hard length limit of unboken squence.
+ * Note:
+ *   Following value is the maximum number of octet sequences consisting
+ *   character, in 1000 octets terminated by CRLF.  Because, in `legacy'
+ *   encodings single character can be assumed occupying 5 octets or less
+ *   (6 octets is very rare).
+ */
+#define LINEFOLD_HARD_LIMIT                     199
+
+#endif /* LINEFOLD_H */
