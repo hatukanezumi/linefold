@@ -8,28 +8,21 @@
  * $id$
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include "common.h"
-#if HAVE_LOCALE_H
-#  if HAVE_SETLOCALE
-#    include <locale.h>
-#    if USE_LIBCHARSET
-#      if HAVE_LOCALCHARSET_H
-#        include <localcharset.h>
-#      elif HAVE_LIBCHARSET_H
-#        include <libcharset.h>
-#      endif /* HAVE_LOCALCHARSET_H */
-#    elif HAVE_LANGINFO_CODESET
-#      include <langinfo.h>
-#    endif /* USE_LIBCHARSET */
-#  endif /* HAVE_SETLOCALE */
-#endif /* HAVE_LOCALE_H */	
 #include "linefold.h"
 
-#define DEFAULT_CHARSET "UTF-8"
+#define DEFAULT_CHARSET "ASCII"
 
-extern size_t decode(const char *, char *, size_t, unicode_char **);
-extern size_t encode(const char *, unicode_char *, size_t, char **);
+extern size_t
+decode(const char *, char *, int *, size_t, unicode_char **, int);
+extern size_t
+encode(const char *, struct linefold_info *, unicode_char *, int, size_t,
+       char **);
+
+void error_exit(int, char *);
+void usage(char **);
 
 
 /*
@@ -41,28 +34,41 @@ void writeout_cb(struct linefold_info *lbinfo, unicode_char *text,
 		 size_t start, size_t linelen, linefold_action action,
 		 void *voidarg)
 {
-	char *str;
-	if (encode((char *)voidarg, text+start, linelen, &str) <= 0)
-		return;
+	char *str=NULL;
+	size_t len;
+	unicode_char newline_text[1] = { (unicode_char)0x000A };
+
+	if ((len = encode((char *)voidarg, lbinfo, text, start, linelen,
+			  &str)) < 0)
+		error_exit(errno, strerror(errno));
+
+	if (str != NULL) {
+		if (len > 0) fwrite(str, len, 1, stdout);
+		free(str);
+	}
 
 	switch (action)
 	{
 	case LINEFOLD_ACTION_EXPLICIT:
-		fputs(str, stdout);
 		break;
 	case LINEFOLD_ACTION_DIRECT:
-		fputs(str, stdout);
-		putc('\n', stdout);
-		break;
 	case LINEFOLD_ACTION_INDIRECT:
-		fputs(str, stdout);
-		putc('\n', stdout);
+		if ((len = encode((char *)voidarg, NULL,
+				  newline_text, 0, 1, &str)) < 0)
+			error_exit(errno, strerror(errno));
+		fwrite(str, len, 1, stdout);
+		free(str);
 		break;
 	case LINEFOLD_ACTION_EOT:
-		fputs(str, stdout);
+		if ((len = encode((char *)voidarg, NULL,
+				  NULL, 0, 0, &str)) < 0)
+			error_exit(errno, strerror(errno));
+		if (str != NULL) {
+			if (len > 0) fwrite(str, len, 1, stdout);
+			free(str);
+		}
 		break;
 	}
-	free(str);
 }
 
 /*
@@ -71,7 +77,8 @@ void writeout_cb(struct linefold_info *lbinfo, unicode_char *text,
 
 void usage(char **argv)
 {
-	printf("USAGE: %s [-c charset] [-o option] [-w linewidth] [-h] [file]\n"
+	printf("USAGE: %s [-c charset] [-f charset] [-o option] [-t charset]\n"
+	       "           [-w linewidth] [-h] [file...]\n"
 	       "\n"
 	       "Options:\n"
 	       "    -c charset\n"
@@ -91,28 +98,35 @@ void usage(char **argv)
 	       argv[0]);
 }
 
+void error_exit(int errnum, char *msg)
+{
+	fprintf(stderr, "linefold: %s\n", msg);
+	exit(errnum? errnum: 255);
+}
+
 int main(int argc, char** argv)
 {
 	unicode_char *text=NULL;
 	size_t textlen=0, alloced=0;
 	FILE *ifp;
-	char buf[4096];
+	char buf[4096], *nbuf;
 	struct linefold_info *lbi;
-	int maxlen=0, opt=-1, i;
+	int maxlen=0, i;
+	linefold_flags flags=(linefold_flags)-1;
 	char *locale_chset=NULL;
 	char *context_chset=NULL, *from_chset=NULL, *to_chset=NULL;
 
 #if HAVE_LOCALE_H
 #  if HAVE_SETLOCALE
-        setlocale(LC_ALL, "");
+	char *lc_ctype = setlocale(LC_CTYPE, NULL);
 #    if USE_LIBCHARSET
-        setlocale(LC_CTYPE, "");
-        locale_chset = locale_charset();
+	setlocale(LC_CTYPE, "");
+	locale_chset = locale_charset();
 #    elif HAVE_LANGINFO_CODESET
-        setlocale(LC_CTYPE, "");
-        locale_chset = nl_langinfo(CODESET);
+	setlocale(LC_CTYPE, "");
+	locale_chset = nl_langinfo(CODESET);
 #    endif  /* USE_LIBCHARSET */
-        setlocale(LC_CTYPE, "C");
+	setlocale(LC_CTYPE, lc_ctype);
 #  endif /* HAVE_SETLOCALE */
 #endif /* HAVE_LOCALE_H */
 	if (locale_chset == NULL || *locale_chset == '\0')
@@ -145,7 +159,7 @@ int main(int argc, char** argv)
 				from_chset = arg;
 				break;
 			case 'o':
-				opt = atoi(arg);
+				flags = (linefold_flags)atol(arg);
 				break;
 			case 't':
 				to_chset = arg;
@@ -173,45 +187,73 @@ int main(int argc, char** argv)
 		context_chset = to_chset;
 	if (maxlen <= 0)
 		maxlen = 72;
-	if (opt < 0)
-		opt = LINEFOLD_OPTION_DEFAULT;
+	if (flags == (linefold_flags)-1)
+		flags = LINEFOLD_OPTION_DEFAULT;
 
-	if (i < argc)
+	if (i >= argc)
 	{
-		if ((ifp = fopen(argv[i], "rb")) == NULL)
-			return 1;
+		argc = 1;
+		argv[0] = "-";
+		i = 0;
 	}
-	else
-		ifp = stdin;
-
-	while (fgets(buf, 4095, ifp) != NULL)
+	text = NULL;
+	textlen = 0;
+	while (i < argc)
 	{
-		unicode_char *ubuf=NULL;
-		alloced = decode(from_chset, buf, strlen(buf), &ubuf);
-		if (alloced > 0)
+		if (argv[i][0] == '-' && argv[i][1] == '\0')
+			ifp = stdin;
+		else if ((ifp = fopen(argv[i], "rb")) == NULL)
+			error_exit(errno, strerror(errno));
+		i++;
+
+		nbuf = buf;
+		while (fgets(nbuf, sizeof(buf)-(nbuf-buf)-1, ifp) != NULL)
 		{
-			unicode_char *newtext = malloc(sizeof(unicode_char) * (textlen + alloced));
-			memcpy(newtext, text, sizeof(unicode_char) * textlen);
-			memcpy(newtext + textlen, ubuf, sizeof(unicode_char) * alloced);
-			if (text != NULL)
-				free(text);
-			text = newtext;
-			textlen += alloced;
-			free(ubuf);
+			int bufpos, buflen;
+			bufpos = 0;
+			buflen = strlen(buf);
+			errno = 0;
+			if ((textlen = decode(from_chset, buf, &bufpos, buflen,
+					      &text, textlen)) == -1) {
+				if (errno == ENOMEM)
+					error_exit(errno, "memory exausted.");
+				else if (errno == EINVAL)
+					error_exit(errno,
+						   "unsupported character set for input.");
+				else if (errno == EILSEQ)
+					error_exit(errno,
+						   "illegal input sequence.");
+				else
+					error_exit(errno, strerror(errno));
+			}
+
+			if (errno == EINVAL) {
+				memmove(buf, buf + bufpos, buflen - bufpos);
+				nbuf = buf + buflen - bufpos;
+			} else {
+				nbuf = buf;
+			}
 		}
+		fclose(ifp);
+		/* Trim EOF at end of file. */
+		while (textlen > 0 && text[textlen-1] == (unicode_char)0x001A)
+			textlen--;
 	}
-	fclose(ifp);
 
 	if ((lbi = linefold_alloc(text, textlen, NULL, NULL,
-					   context_chset, opt)) == NULL)
+				  context_chset, flags)) == NULL)
 	{
+		if (errno == ENOMEM)
+			error_exit(errno, "memory exausted.");
+		else if (errno)
+			error_exit(errno, strerror(errno));
 		if (text != NULL) free(text);
 		exit(0);
 	}
 	linefold(lbi, text, NULL, &writeout_cb, maxlen,
-			  (void *)to_chset);
+		 (void *)to_chset);
 	linefold_free(lbi);
-
 	free(text);
+
 	exit(0);
 }

@@ -9,13 +9,12 @@
  * $Id$
  */
 
+#include <assert.h>
 #include "common.h"
 #include "linefold.h"
-#include <assert.h>
-#include <string.h>
 
 static size_t find_linebreak(size_t, linefold_class *,
-			     linefold_action *, int);
+			     linefold_action *, linefold_flags);
 
 /*
  * Public Functions
@@ -25,10 +24,10 @@ static size_t find_linebreak(size_t, linefold_class *,
 struct linefold_info
 *linefold_alloc(unicode_char *text, size_t textlen,
 		linefold_lbprop_funcptr
-		(*find_lbprop_func)(const char *, int),
+		(*find_lbprop_func)(const char *, linefold_flags),
 		void (*tailor_lbprop)(unicode_char, int *, linefold_class *,
-				      int),
-		const char *chset, int flags)
+				      linefold_flags),
+		const char *chset, linefold_flags flags)
 {
   struct linefold_info *lbinfo;
   int *widths;
@@ -112,18 +111,18 @@ void linefold_free(struct linefold_info *lbinfo)
 /* Do line breaking */
 linefold_action
 linefold(struct linefold_info *lbinfo, unicode_char *text,
-		  int (*is_line_exceeded)(struct linefold_info *,
-					  unicode_char *,
-					  size_t, size_t, int, void *),
-		  void (*writeout_cb)(struct linefold_info *,
-				      unicode_char *,
-				      size_t, size_t, linefold_action,
-				      void *),
-		  int maxlen, void *voidarg)
+	 int (*is_line_exceeded)(struct linefold_info *,
+				 unicode_char *,
+				 size_t, size_t, int, void *),
+	 void (*writeout_cb)(struct linefold_info *,
+			     unicode_char *,
+			     size_t, size_t, linefold_action,
+			     void *),
+	 int maxlen, void *voidarg)
 {
   size_t textlen;
   linefold_action *lbactions;
-  int flags;
+  linefold_flags flags;
   linefold_action global_action=LINEFOLD_ACTION_NOMOD,
     action, prevaction;
   size_t i=0, linestart, prevopp;
@@ -218,7 +217,7 @@ linefold(struct linefold_info *lbinfo, unicode_char *text,
 /* Internal default of function to find function that get properties of
    a character.  */
 linefold_lbprop_funcptr
-linefold_find_lbprop_func(const char *chset, int flags)
+linefold_find_lbprop_func(const char *chset, linefold_flags flags)
 {
   if (chset == NULL || flags & LINEFOLD_OPTION_GENERIC_WIDTH)
     return &linefold_getprop_generic;
@@ -266,7 +265,7 @@ linefold_find_lbprop_func(const char *chset, int flags)
 /* Internal default of functin to tailor character property. */
 void
 linefold_tailor_lbprop(unicode_char c, int *widthptr, linefold_class *lbcptr,
-		       int flags)
+		       linefold_flags flags)
 {
   int width = *widthptr;
   linefold_class lbc = *lbcptr;
@@ -277,12 +276,12 @@ linefold_tailor_lbprop(unicode_char c, int *widthptr, linefold_class *lbcptr,
       (unicode_char)0x00D7 != c && (unicode_char)0x00F7 != c)
     width = 1;
   else if (flags & LINEFOLD_OPTION_NARROW_GREEK &&
-      width == 2 &&
-      (unicode_char)0x0370 <= c && c <= (unicode_char)0x03FF)
+	   width == 2 &&
+	   (unicode_char)0x0370 <= c && c <= (unicode_char)0x03FF)
     width = 1;
   else if (flags & LINEFOLD_OPTION_NARROW_CYRILLIC &&
-      width == 2 &&
-      (unicode_char)0x0400 <= c && c <= (unicode_char)0x04FF)
+	   width == 2 &&
+	   (unicode_char)0x0400 <= c && c <= (unicode_char)0x04FF)
     width = 1;
 
 #ifdef LINEFOLD_CLASS_HY
@@ -339,7 +338,7 @@ linefold_tailor_lbprop(unicode_char c, int *widthptr, linefold_class *lbcptr,
 #  ifdef LINEFOLD_CLASS_CLSP
       lbc = LINEFOLD_CLASS_CLSP;
 #  else
-      lbc = LINEFOLD_CLASS_CL;
+    lbc = LINEFOLD_CLASS_CL;
 #  endif
     break;
 #endif
@@ -407,7 +406,7 @@ linefold_tailor_lbprop(unicode_char c, int *widthptr, linefold_class *lbcptr,
 static size_t find_linebreak(size_t textlen,
 			     linefold_class *lbclasses,
 			     linefold_action *lbactions,
-			     int flags)
+			     linefold_flags flags)
 {
   linefold_class before; /* class of 'before' character */
   linefold_class after;
@@ -520,14 +519,14 @@ static size_t find_linebreak(size_t textlen,
 /* Internal default of function to check if length of a line exceeds
    limit. */
 int linefold_check_length(struct linefold_info *lbinfo,
-				   unicode_char *text,
-				   size_t start, size_t len, int maxlen,
-				   void *voidarg)
+			  unicode_char *text,
+			  size_t start, size_t len, int maxlen,
+			  void *voidarg)
 {
   size_t end = start + len;
   int *widths = lbinfo->widths;
   linefold_class *lbclasses = lbinfo->lbclasses;
-  int flags = lbinfo->flags;
+  linefold_flags flags = lbinfo->flags;
 
   size_t i;
   int length = 0;
@@ -545,10 +544,10 @@ int linefold_check_length(struct linefold_info *lbinfo,
 #ifdef LINEFOLD_CLASS_JL
 #ifdef LINEFOLD_CLASS_JV
 #ifdef LINEFOLD_CLASS_JT
-    /* Convention for Hangul combining jamo.
-     * choseong+jungseong or choseong+jungseong+jongseong
-     * is single Wide character.
-     */
+      /* Convention for Hangul combining jamo.
+       * choseong+jungseong or choseong+jungseong+jongseong
+       * is single Wide character.
+       */
     case LINEFOLD_CLASS_JV:
       if (!(flags & LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO) &&
 	  i >= start+1 && lbclasses[i-1] == LINEFOLD_CLASS_JL)

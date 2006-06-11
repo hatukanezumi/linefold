@@ -15,8 +15,8 @@ $ make
 # make install
 
 
-API
-===
+linefold Library API
+====================
 
 1. Header
 
@@ -27,11 +27,11 @@ API
 struct linefold_info
 *linefold_alloc(unicode_char *text, size_t textlen,
                          linefold_lbprop_funcptr
-                         (*find_lbprop_func)(const char *, int),
+                         (*find_lbprop_func)(const char *, linefold_flags),
                          void (*tailor_lbprop)(unicode_char,
                                                int *, linefold_class *,
-                                               int),
-                         const char *chset, int flags);
+                                               linefold_flags),
+                         const char *chset, linefold_flags flags);
 
     Allocate line breaking informations for given unicode text.
 
@@ -165,7 +165,7 @@ Note: Don't modify built-in support functions contained in
   functions.  For more details see Option Flags.
 
 linefold_lbprop_funcptr linefold_find_lbprop_func(const char *chset,
-                                                          int flags);
+                                                  linefold_flags flags);
 
         Find a function to get character property suitable for
         specified charset `chset'.  If `chset' is NULL, length of `chset'
@@ -174,9 +174,8 @@ linefold_lbprop_funcptr linefold_find_lbprop_func(const char *chset,
         be returned. 
 
 void linefold_tailor_lbprop(unicode_char c,
-                                     int *widthptr,
-                                     linefold_class *lbcptr,
-                                     int flags);
+                            int *widthptr, linefold_class *lbcptr,
+                            linefold_flags flags);
 
         Sets customized width and line breaking class information of
         character c.
@@ -197,16 +196,16 @@ int linefold_check_length(struct linefold_info *lbinfo,
 Option Flags
 ============
 
-#define LINEFOLD_OPTION_GENERIC_WIDTH           1
+LINEFOLD_OPTION_GENERIC_WIDTH           1
 
   Function: linefold_find_lbprop_func()
 
   Resolve character width within generic (Unicode) context, even if
   character set context was specified.
 
-#define LINEFOLD_OPTION_NARROW_LATIN            (1<<1)
-#define LINEFOLD_OPTION_NARROW_GREEK            (1<<2)
-#define LINEFOLD_OPTION_NARROW_CYRILLIC         (1<<3)
+LINEFOLD_OPTION_NARROW_LATIN            (1<<1)
+LINEFOLD_OPTION_NARROW_GREEK            (1<<2)
+LINEFOLD_OPTION_NARROW_CYRILLIC         (1<<3)
 
   Function: linefold_tailor_lbprop()
 
@@ -216,40 +215,40 @@ Option Flags
   multibyte context.  Set these options to treat such letters always
   Narrow.
 
-#define LINEFOLD_OPTION_BREAK_HY                (1<<4)
+LINEFOLD_OPTION_BREAK_HY                (1<<4)
 
   Function: linefold_tailor_lbprop()
 
   Set this to allow break after HY (U+002D HYPHEN-MINUS), before AL.
   By default, breaking directly before AL is not allowed.
 
-#define LINEFOLD_OPTION_BREAK_SOFT_HYPHEN       (1<<5)
+LINEFOLD_OPTION_BREAK_SOFT_HYPHEN       (1<<5)
 
   Function: linefold_tailor_lbprop()
 
   Set this to allow break after U+00AD SOFT HYPHEN.  By default, breaking
   directly after soft hyphen is not allowed.
 
-#define LINEFOLD_OPTION_NOBREAK_NL              (1<<6)
+LINEFOLD_OPTION_NOBREAK_NL              (1<<6)
 
   Function: linefold_tailor_lbprop()
 
   Set this to treat U+0085 NEL as CM, not BK. [UAX#14]
 
-#define LINEFOLD_OPTION_NOBREAK_VT              (1<<7)
+LINEFOLD_OPTION_NOBREAK_VT              (1<<7)
 
   Function: linefold_tailor_lbprop()
 
   Set this to treat U+000B vertical tab as CM, not BK. [UAX#14]
 
-#define LINEFOLD_OPTION_NOHUNG_PUNCT            (1<<8)
+LINEFOLD_OPTION_NOHUNG_PUNCT            (1<<8)
 
   Function: linefold_tailor_lbprop()
 
   Set this to disable "burasage" (hunging punctuation in East Asian
   text).
 
-#define LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<9)
+LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<9)
 
   Function: linefold_tailor_lbprop()
 
@@ -257,48 +256,48 @@ Option Flags
   Narrow character preceded/followed by SP.  Set this to disable
   such feature.
 
-#define LINEFOLD_OPTION_IDSP_IS_SP              (1<<10)
+LINEFOLD_OPTION_IDSP_IS_SP              (1<<10)
 
   Function: linefold_tailor_lbprop()
 
   By default, IDEOGRAPHIC SPACE is treated as ID.  Set this to treat
   it as SP.
 
-#define LINEFOLD_OPTION_RELAX_KANA_NS           (1<<11)
+LINEFOLD_OPTION_RELAX_KANA_NS           (1<<11)
 
   Function: linefold_tailor_lbprop()
 
   By default, small hiragana/katakana and KATAKANA-HIRAGANA PROLONGED
   SIGN are NS.  Set this to treat these characters as ID. [JIS X 4051]
 
-#define LINEFOLD_OPTION_OPAL_IS_AL              (1<<12)
+LINEFOLD_OPTION_OPAL_IS_AL              (1<<12)
 
   Function: linefold_tailor_lbprop()
 
   Set this to treat spanish quotations INVERTED EXCLAMATION MARK and
   INVERTED QUESTION MARK as AL, not OP. [UAX#14]
 
-#define LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<13)
+LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<13)
 
   Function: linefold()
 
   Set this option to ommit Direct break oppotunities.
   WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
 
-#define LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<14)
+LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<14)
 
   Function: linefold_check_length()
 
   Set this option not to combine hangul combining jamos (JT, JV, JL)
   when line lengths are determined.
 
-#define LINEFOLD_OPTION_BREAK_SPCM              (1<<15)
+LINEFOLD_OPTION_BREAK_SPCM              (1<<15)
 
   Function: linefold()
 
   Set this to break SP+CM sequence. [UAX#14]
 
-#define LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<16)
+LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<16)
 
   Function: linefold()
 
@@ -306,8 +305,6 @@ Option Flags
   width.  By default, longer text won't be broken.
   This violate line breaking rules then may cause break within words,
   syllables, characters or on somewhere unpreferred.
-
-#define LINEFOLD_OPTION_DEFAULT                 0
 
 
 Notes
@@ -336,7 +333,7 @@ a) Sequence of SPACEs terminating Indirect break or sequences of newline
   breaking algorithm employed by this module expects that SPACEs or newlines
   at end of line will be handled on application side.
 
-b) Long character sequences in which no line break oppotunities found,
+b) Long character sequences in which no line break oppotunities are found,
   for example Aopadotenachoselachogaleokranioleipsanodrimhipotrimmatosilphioparaomelitokatakechymenokichlepikossyphophattoperisteralektryonoptekephalliokigklopeleiolagoiosiraiobaphetraganopterygon.
   If you exactly shouldn't allow such pathological cases, Set
   LINEFOLD_OPTION_FORCE_LINEWIDTH on.
@@ -360,5 +357,10 @@ f) Inappropriate assignment of character properties, or possiblly
   any characters not yet covered by this module.  If you found such a case,
   please inform me.
 
+
+Author
+======
+
+Hatuka*nezumi - IKEDA Soji <hatuka@nezumi.nu>.
 
 $$

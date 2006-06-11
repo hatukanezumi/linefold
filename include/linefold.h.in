@@ -12,8 +12,10 @@
 #ifndef LINEFOLD_H
 #define LINEFOLD_H
 
+@INCLUDE_WCHAR_H@
 typedef @UNICODE_TYPE@ unicode_char;
 typedef int linefold_class;
+typedef @LINEFOLD_OPTION_TYPE@ linefold_flags;
 
 #include "linefoldtab.h"
 
@@ -22,13 +24,13 @@ typedef int linefold_class;
  * [*] may be feed to callback funtion by linefold().
  */
 typedef enum {
-	LINEFOLD_ACTION_PROHIBITED=0,         /* Prohibited Break */
-	LINEFOLD_ACTION_COMBINING_PROHIBITED, /* Prohibited Break for CM */
-	LINEFOLD_ACTION_COMBINING_INDIRECT,   /* Indirect Break for CM */
-	LINEFOLD_ACTION_INDIRECT,             /* Indirect Break [*] */
-	LINEFOLD_ACTION_DIRECT,               /* Direct Break [*] */
-	LINEFOLD_ACTION_EXPLICIT,             /* Explicit Break [*] */
-	LINEFOLD_ACTION_EOT                   /* End of Text [*] */
+  LINEFOLD_ACTION_PROHIBITED=0,         /* Prohibited Break */
+  LINEFOLD_ACTION_COMBINING_PROHIBITED, /* Prohibited Break for CM */
+  LINEFOLD_ACTION_COMBINING_INDIRECT,   /* Indirect Break for CM */
+  LINEFOLD_ACTION_INDIRECT,             /* Indirect Break [*] */
+  LINEFOLD_ACTION_DIRECT,               /* Direct Break [*] */
+  LINEFOLD_ACTION_EXPLICIT,             /* Explicit Break [*] */
+  LINEFOLD_ACTION_EOT                   /* End of Text [*] */
 } linefold_action;
 #define LINEFOLD_ACTION_NOMOD LINEFOLD_ACTION_PROHIBITED
 
@@ -41,13 +43,13 @@ typedef void (*linefold_lbprop_funcptr)(unicode_char, int *, linefold_class *);
  */
 struct linefold_info
 {
-  int *widths;                      /* character widths */
-  linefold_class *lbclasses;  /* line breaking classes */
-  linefold_action *lbactions; /* probable line breaking actions */
-  char *charset;                    /* charset context */
-  size_t length;                    /* length of text */
-  int flags;                        /* options to tailor line breaking
-                                       behavior */
+  int *widths;                          /* character widths */
+  linefold_class *lbclasses;            /* line breaking classes */
+  linefold_action *lbactions;           /* probable line breaking actions */
+  char *charset;                        /* charset context */
+  size_t length;                        /* length of text */
+  linefold_flags flags;                 /* options to tailor line breaking
+					   behavior */
 };
 
 /*
@@ -55,25 +57,26 @@ struct linefold_info
  */
 extern struct linefold_info
 *linefold_alloc(unicode_char *, size_t,
-		linefold_lbprop_funcptr(*)(const char *, int),
-		void (*)(unicode_char, int *, linefold_class *, int),
-		const char *, int);
+		linefold_lbprop_funcptr(*)(const char *, linefold_flags),
+		void (*)(unicode_char, int *, linefold_class *,
+			 linefold_flags),
+		const char *, linefold_flags);
 
 extern void linefold_free(struct linefold_info *);
 
 extern linefold_action
 linefold(struct linefold_info *, unicode_char *,
-		  int (*)(struct linefold_info *, unicode_char *,
-			  size_t, size_t, int, void *),
-		  void (*)(struct linefold_info *, unicode_char *,
-			   size_t, size_t, linefold_action, void *),
-		  int, void *);
+	 int (*)(struct linefold_info *, unicode_char *,
+		 size_t, size_t, int, void *),
+	 void (*)(struct linefold_info *, unicode_char *,
+		  size_t, size_t, linefold_action, void *),
+	 int, void *);
 
 /* Built-in support functions */
 extern linefold_lbprop_funcptr
-linefold_find_lbprop_func(const char *, int);
+linefold_find_lbprop_func(const char *, linefold_flags);
 extern void
-linefold_tailor_lbprop(unicode_char, int *, linefold_class *, int);
+linefold_tailor_lbprop(unicode_char, int *, linefold_class *, linefold_flags);
 extern int
 linefold_check_length(struct linefold_info *, unicode_char *, size_t, size_t,
 		      int, void* voidarg);

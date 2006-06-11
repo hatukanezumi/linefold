@@ -1,14 +1,14 @@
 lib_LTLIBRARIES = libinefold.la
 libinefold_la_SOURCES = lib/linefold.c lib/linefoldtab.c include/common.h
 libinefold_la_CFLAGS = -Iinclude
-libinefold_la_LDFLAGS = -version-info 1:0:0
+libinefold_la_LDFLAGS = -version-info 2:0:0
 
 include_HEADERS = include/linefold.h include/linefoldtab.h
 
 if ENABLE_BIN
 bin_PROGRAMS = linefold
 linefold_SOURCES = src/main.c src/iconv_wrap.c include/common.h
-linefold_CFLAGS = -Iinclude
+linefold_CFLAGS = -Iinclude @ICONV_INC@ @CHARSET_INC@
 linefold_LDFLAGS = @ICONV_LIB@ @CHARSET_LIB@
 linefold_LDADD = libinefold.la
 endif

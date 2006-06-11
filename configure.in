@@ -57,25 +57,24 @@ fi
 
 # determine type of unicode_char
 AC_MSG_CHECKING(what type to use for unicode)
-AC_ARG_ENABLE(unicode,
-  AC_HELP_STRING(--enable-unicode@<:@=wchar_t|ucs4|ucs2@:>@,
-  Enable Unicode strings (default is yes)),
-  [],
-  [enable_unicode=yes])
+AC_ARG_WITH(unicode,
+  AC_HELP_STRING(--with-unicode@<:@=wchar_t|ucs4|ucs2@:>@,
+  [type of Unicode character (default is yes)]),
+  with_unicode=$withval,with_unicode='yes')
 
-if test $enable_unicode = yes
+if test $with_unicode = yes
 then
   if test "$wchar_h" = "yes"
   then
-    enable_unicode="wchar_t"
+    with_unicode="wchar_t"
   else
-    enable_unicode="ucs4"
+    with_unicode="ucs4"
   fi
 fi
 
 AH_TEMPLATE(SIZEOF_UNICODE_CHAR,
   [Define as the size of the unicode type.])
-case "$enable_unicode" in
+case "$with_unicode" in
 ucs2)
   unicode_size="2"
   AC_DEFINE(SIZEOF_UNICODE_CHAR,2)
@@ -89,36 +88,43 @@ wchar_t)
   AC_DEFINE_UNQUOTED(SIZEOF_UNICODE_CHAR,$ac_cv_sizeof_wchar_t)
   ;;
 *)
-  unicode_size="1"
-  AC_DEFINE(SIZEOF_UNICODE_CHAR,1)
+  AC_MSG_ERROR(Cannot determine size of Unicode.)
   ;;
 esac
 
-if test "$enable_unicode" = "no"
+if test "$unicode_size" = "$ac_cv_sizeof_wchar_t"
 then
-  UNICODE_TYPE="unsigned char"
-  AC_MSG_RESULT(not used)
+  UNICODE_TYPE="wchar_t"
+  AC_DEFINE(HAVE_USABLE_WCHAR_T, 1,
+  [Define if you have a useable wchar_t type defined in wchar.h.])
+  INCLUDE_WCHAR_H="#include <wchar.h>"
+elif test "$ac_cv_sizeof_short" = "$unicode_size"
+then
+  UNICODE_TYPE="unsigned short"
+elif test "$ac_cv_sizeof_long" = "$unicode_size"
+then
+  UNICODE_TYPE="unsigned long"
 else
-  AC_DEFINE(HAVE_UNICODE, 1,
-  [Define if you want to have a Unicode type.])
-  if test "$unicode_size" = "$ac_cv_sizeof_wchar_t"
-  then
-    UNICODE_TYPE="wchar_t"
-    AC_DEFINE(HAVE_USABLE_WCHAR_T, 1,
-    [Define if you have a useable wchar_t type defined in wchar.h.])
-  elif test "$ac_cv_sizeof_short" = "$unicode_size"
-  then
-    UNICODE_TYPE="unsigned short"
-  elif test "$ac_cv_sizeof_long" = "$unicode_size"
-  then
-    UNICODE_TYPE="unsigned long"
-  else
-    AC_MSG_ERROR(no type found.)
-  fi
-  AC_MSG_RESULT($UNICODE_TYPE)
+  AC_MSG_ERROR(no type found.)
 fi
-
+AC_MSG_RESULT($UNICODE_TYPE)
 AC_SUBST(UNICODE_TYPE)
+AC_SUBST(INCLUDE_WCHAR_H)
+
+# Determine type of bitwise flag.
+AC_CHECKING(what type to use for bitwise option)
+if test "$ac_cv_sizeof_short" -ge 4
+then
+  LINEFOLD_OPTION_TYPE="unsigned short"
+elif test "$ac_cv_sizeof_long" -ge 4
+then
+  LINEFOLD_OPTION_TYPE="unsigned long"
+else
+  AC_MSG_ERROR(not found)
+fi
+AC_MSG_RESULT("$LINEFOLD_OPTION_TYPE")
+AC_SUBST(LINEFOLD_OPTION_TYPE)
+
 
 # Check for endians
 AC_C_BIGENDIAN
@@ -147,8 +153,6 @@ then
   if test -n "$ICONV_INCDIR"
   then
     ICONV_INC="-I$ICONV_INCDIR"
-    CFLAGS="$ICONV_INC $CFLAGS"
-    CPPFLAGS="$ICONV_INC $CPPFLAGS"
   fi
   AC_MSG_RESULT([$ICONV_LIB])
 else
@@ -161,6 +165,7 @@ else
     AC_MSG_RESULT([not found.])
   fi
 fi
+AC_SUBST(ICONV_INC)
 AC_SUBST(ICONV_LIB)
 
 # Determine internal Unicode charset.
@@ -205,7 +210,7 @@ int main()
 }
 EOF
     changequote([, ])
-    $CC $CFLAGS $ICONV_LIB $LDFLAGS -o conftest.out conftest.c
+    $CC $ICONV_INC $CFLAGS $ICONV_LIB $LDFLAGS -o conftest.out conftest.c
     internal_charset=`./conftest.out`
     AC_MSG_RESULT($internal_charset)
     if test "$internal_charset" = "unknown"
@@ -217,10 +222,10 @@ EOF
 fi
 
 AC_ARG_ENABLE(bin,
-  [  --disable-bin        Disable binary executable],
+  [  --disable-bin           Disable binary executable],
   [],
   [enable_bin=yes])
-if test "$enable_unicode" = "no" -o -z "$ICONV_LIB"
+if test "$with_unicode" = "no" -o -z "$ICONV_LIB"
 then
   enable_bin="no"
 fi
@@ -257,8 +262,6 @@ else
         then
           CHARSET_INC="-I$CHARSET_INCDIR"
         fi
-        CFLAGS="$CHARSET_INC $CFLAGS"
-        CPPFLAGS="$CHARSET_INC $CPPFLAGS"
         AC_CHECK_HEADERS([localcharset.h libcharset.h])
       else
         AC_MSG_ERROR([libcharset was not found.  Install libcharset package.])
@@ -272,6 +275,7 @@ else
     AC_MSG_RESULT(Locale based conversion feature disabled.)
   fi
 fi
+AC_SUBST(CHARSET_INC)
 AC_SUBST(CHARSET_LIB)
 
 AC_CONFIG_FILES(Makefile include/linefold.h)
