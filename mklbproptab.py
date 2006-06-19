@@ -4,9 +4,16 @@
 """
 mklbproptab.py - Generate linefoldtab.c & linefoldtab.h
 
-Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
-redistributed under GNU General Public License version 2 (or later
-version you prefer).
+Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+
+This file is part of the Linefold Package.  This program is free
+software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.  This program is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+COPYING file for more details.
 
 $Id$
 
@@ -118,6 +125,30 @@ legacy_maps = AmbiguousWidth.getmap(propmap)
 ### 
 
 allclasses = []
+for eaw, lbc in propmap.values():
+    if lbc not in allclasses:
+        allclasses.append(lbc)
+for m in legacy_maps.values():
+    for eaw, lbc in m.values():
+        if lbc not in allclasses:
+            allclasses.append(lbc)
+allclasses.sort()        
+
+idx = 0
+class_idx = {}
+for c in ORDINAL_CLASSES:
+    class_idx[c] = idx
+    idx += 1
+class_idx['SP'] = idx
+idx += 1
+for c in EXPLICIT_BREAK_CLASSES:
+    class_idx[c] = idx
+    idx += 1
+for c in [c for c in allclasses
+          if not c in ORDINAL_CLASSES+EXPLICIT_BREAK_CLASSES+['SP']]:
+    class_idx[c] = idx
+    idx += 1
+
 
 fp = file(LBPROPTAB, 'w')
 print >>fp, """\
@@ -128,63 +159,107 @@ print >>fp, """\
 
 #include "common.h"
 #include "linefold.h"
+""" % { 'myname': MYNAME, }
 
+idx = 0
+print >>fp, """\
+/*
+ * Classes appear in linefold_lbpairs[][] table.
+ * NOTE: Order is important.
+ */
+"""
+for c in ORDINAL_CLASSES:
+    print >>fp, "const linefold_class LINEFOLD_CLASS_%s = %2d;" % (c, idx)
+    idx += 1
+print >>fp, ""
+
+print >>fp, """\
+/* Placeholder to indicate end of ordinal classes. */
+const linefold_class LINEFOLD_CLASS_TABLESIZE = %2d;
+""" % idx
+
+print >>fp, """\
+/*
+ * Below from here shouldn't appear in linefold_lbpairs[][] table.
+ */
+
+/* SPACE */
+const linefold_class LINEFOLD_CLASS_SP = %2d;
+""" % idx
+idx += 1
+print >>fp, ""
+
+print >>fp, """\
+/* Explicit break. */
+"""
+for c in EXPLICIT_BREAK_CLASSES:
+    print >>fp, "const linefold_class LINEFOLD_CLASS_%s = %2d;" % (c, idx)
+    idx += 1
+print >>fp, ""
+
+print >>fp, """\
 /*
  * Character properties related on line breaking behavior.
  */
 typedef struct
 {
-	unicode_char    range_s;
-	unicode_char    range_e;
+	linefold_char   range_s;
+	linefold_char   range_e;
 	int             width;        /* UAX#11 East Asian Width */
-	linefold_class lbclass; /* UAX#14 Line Breaking Class */
+	linefold_class  lbclass;      /* UAX#14 Line Breaking Class */
 } lbprop;
 
 /*
  * Unicode Character Property Table
  */
-""" % { 'myname': MYNAME }
+"""
 
 # Write generic property map.
 print >>fp, "static lbprop lbprop_tab[] = {"
-num4, num2, num1 = printpropmap(fp, propmap, allclasses)
+num4, num2, num1 = printpropmap(fp, propmap, class_idx)
 print >>fp, """\
-#if SIZEOF_UNICODE_CHAR > 2
-    {0x20000, 0x2FFFD, 2, LINEFOLD_CLASS_ID},   /* Supplemental Ideographs */
-    {0x30000, 0x3FFFD, 2, LINEFOLD_CLASS_ID},   /* Ideographs in the future */
-    {0xE0000, 0xE01EF, 0, LINEFOLD_CLASS_CM},   /* Tags */
-    {0xF0000, 0xFFFFD, 1, LINEFOLD_CLASS_AL},   /* Plane 15 Private Use */
-    {0x100000, 0x10FFFD, 1, LINEFOLD_CLASS_AL}, /* Plane 16 Private Use */
-#endif /* SIZEOF_UNICODE_CHAR > 2 */
+#if SIZEOF_LINEFOLD_CHAR > 2
+    {0x20000, 0x2FFFD, 2, %(ID)2d /* ID */},   /* Supplemental Ideographs */
+    {0x30000, 0x3FFFD, 2, %(ID)2d /* ID */},   /* Ideographs in the future */
+    {0xE0000, 0xE01EF, 0, %(CM)2d /* CM */},   /* Tags */
+    {0xF0000, 0xFFFFD, 1, %(AL)2d /* AL */},   /* Plane 15 Private Use */
+    {0x100000, 0x10FFFD, 1, %(AL)2d /* AL */}, /* Plane 16 Private Use */
+#endif /* SIZEOF_LINEFOLD_CHAR > 2 */
     {0, 0, 0, 0}
 };
 
-#if SIZEOF_UNICODE_CHAR > 2
-static size_t lbprop_len = %d;
-#elif SIZEOF_UNICODE_CHAR > 1
-static size_t lbprop_len = %d;
+#if SIZEOF_LINEFOLD_CHAR > 2
+static size_t lbprop_len = %(num4)d;
+#elif SIZEOF_LINEFOLD_CHAR > 1
+static size_t lbprop_len = %(num2)d;
 #else
-static size_t lbprop_len = %d;
-#endif /* SIZEOF_UNICODE_CHAR */
-""" % (num4+5, num2, num1)
+static size_t lbprop_len = %(num1)d;
+#endif /* SIZEOF_LINEFOLD_CHAR */
+""" % { 'num4': num4+5,
+        'num2': num2,
+        'num1': num1,
+        'AL': class_idx['AL'],
+        'CM': class_idx['CM'],
+        'ID': class_idx['ID'],
+        }
 
 ## Write property maps with custom widths.
 lmkeys = legacy_maps.keys()
 lmkeys.sort()
 for r in lmkeys:
     print >>fp, "static lbprop lbprop_%s_tab[] = {" % r
-    num4, num2, num1 = printpropmap(fp, legacy_maps[r], allclasses)
+    num4, num2, num1 = printpropmap(fp, legacy_maps[r], class_idx)
     print >>fp, """\
     {0, 0, 0, 0}
 };
 
-#if SIZEOF_UNICODE_CHAR > 2
+#if SIZEOF_LINEFOLD_CHAR > 2
 static size_t lbprop_%(r)s_len = %(num4)d;
-#elif SIZEOF_UNICODE_CHAR > 1
+#elif SIZEOF_LINEFOLD_CHAR > 1
 static size_t lbprop_%(r)s_len = %(num2)d;
 #else
 static size_t lbprop_%(r)s_len = %(num1)d;
-#endif /* SIZEOF_UNICODE_CHAR */
+#endif /* SIZEOF_LINEFOLD_CHAR */
 """ % {'r': r, 'num4': num4, 'num2': num2, 'num1': num1,}
 
 ## Generate line breaking class pair table and write it.
@@ -209,10 +284,10 @@ print >>fp, """\
 
 static lbprop lbprop_unknown[1] =
 {
-	{0, 0, 1, LINEFOLD_CLASS_AL}
+	{0, 0, 1, %(AL)2d /* AL */}
 };
 
-static lbprop *find_lbprop(lbprop *t, size_t n, unicode_char c)
+static lbprop *find_lbprop(lbprop *t, size_t n, linefold_char c)
 {
 	lbprop *top = t;
 	lbprop *bot = t + n - 1;
@@ -221,9 +296,9 @@ static lbprop *find_lbprop(lbprop *t, size_t n, unicode_char c)
 	while (top <= bot)
 	{
 		cur = top + (bot - top) / 2;
-		if (c < (unicode_char)(cur->range_s))
+		if (c < (linefold_char)(cur->range_s))
 			bot = cur-1;
-		else if ((unicode_char)(cur->range_e) < c)
+		else if ((linefold_char)(cur->range_e) < c)
 			top = cur+1;
 		else
 			return cur;
@@ -232,8 +307,8 @@ static lbprop *find_lbprop(lbprop *t, size_t n, unicode_char c)
 }
 
 /* Generic */
-void linefold_getprop_generic(unicode_char c,
-			      int *widthptr, linefold_class *lbcptr)
+void linefold_getprop_generic(linefold_char c,
+                              linefold_width *widthptr, linefold_class *lbcptr)
 {
 	lbprop *ucp;
 	if ((ucp = find_lbprop(lbprop_tab, lbprop_len, c)) == NULL)
@@ -243,11 +318,11 @@ void linefold_getprop_generic(unicode_char c,
 	if (lbcptr)
 		*lbcptr = ucp->lbclass;
 }
-"""
+""" % { 'AL': class_idx['AL'], }
 for r in lmkeys:
     print >>fp, """\
-void linefold_getprop_%(region)s(unicode_char c,
-			int *widthptr, linefold_class *lbcptr)
+void linefold_getprop_%(region)s(linefold_char c,
+                        linefold_width *widthptr, linefold_class *lbcptr)
 {
 	lbprop *ucp;
 	if ((ucp=find_lbprop(lbprop_%(region)s_tab, lbprop_%(region)s_len, c)) == NULL &&
@@ -264,7 +339,6 @@ fp.close()
 
 ## Write header file.
 fp = file(LBPROPHEADER, 'w')
-allclasses.sort()
 print >>fp, """\
 /*
  * NOTICE: Don't edit this file manually.  To update this file, read
@@ -288,14 +362,14 @@ print >>fp, """\
  */
 """
 for c in ORDINAL_CLASSES:
-    print >>fp, "#define LINEFOLD_CLASS_%s %d" % (c, idx)
+    print >>fp, "extern const linefold_class LINEFOLD_CLASS_%s;" % c
     idx += 1
 print >>fp, ""
 
 print >>fp, """\
 /* Placeholder to indicate end of ordinal classes. */
-#define LINEFOLD_CLASS_TABLESIZE %d
-""" % idx
+extern const linefold_class LINEFOLD_CLASS_TABLESIZE;
+"""
 
 print >>fp, """\
 /*
@@ -303,16 +377,15 @@ print >>fp, """\
  */
 
 /* SPACE */
-#define LINEFOLD_CLASS_SP %d
-""" % idx
+extern const linefold_class LINEFOLD_CLASS_SP;
+"""
 idx += 1
-print >>fp, ""
 
 print >>fp, """\
 /* Explicit break. */
 """
 for c in EXPLICIT_BREAK_CLASSES:
-    print >>fp, "#define LINEFOLD_CLASS_%s %d" % (c, idx)
+    print >>fp, "extern const linefold_class LINEFOLD_CLASS_%s;" % c
     idx += 1
 print >>fp, ""
 
@@ -329,11 +402,13 @@ for c in [c for c in allclasses
 print >>fp, ""
 
 print >>fp, """\
-extern void linefold_getprop_generic(unicode_char, int *, linefold_class *);"""
+extern void linefold_getprop_generic(linefold_char,
+                                     linefold_width *, linefold_class *);"""
 for r in lmkeys:
     print >>fp, """\
-extern void linefold_getprop_%(region)s(unicode_char, int *, linefold_class *);""" % \
-{ 'region': r }
+extern void linefold_getprop_%(region)s(linefold_char,
+                               linefold_width *, linefold_class *);\
+""" % { 'region': r }
 print >>fp, ''
 print >>fp, '#endif /* LINEFOLDTAB_H */'
 fp.close()

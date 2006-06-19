@@ -61,9 +61,11 @@
     <p align="center">( CLH | CLSP | CLHSP ) SP* × NS</p>
     <p class="rule">LB 17: Do not break within ‘——’, even with intervening spaces.</p>
     <p align="center">B2 SP* × B2</p>
+    <p class="rule">LB 18excIDSP: Do not break within sequence of ideographic spaces.</p>
+    <p align="center">IDSP × IDSP</p>
     <p class="rule">LB 18: Break after spaces.</p>
     <p align="center">SP ÷ </p>
-    <p class="rule">LB 18ext: ...and also break after closing punctuations with
+    <p class="rule">LB 18extCLSP: ...and also break after closing punctuations with
       virtual glue.</p>
     <p align="center">( CLSP | CLHSP ) ÷ </p>
     <p class="rule">LB 19: Do not break before or after ‘”’.</p>
@@ -80,14 +82,20 @@
     <p class="rule">LB 22: Do not break between two ellipses, or between letters
       or numbers and ellipsis.</p>
     <p align="center">( AL | ID | IN | NU ) × IN</p>
+    <p class="rule">LB 22ext: ditto.</p>
+    <p align="center">IDSP × IN</p>
     <p class="rule">LB 23: Do not break within ‘a9’, ‘3a’, or ‘H%’.</p>
     <p align="center">ID × PO</p>
     <p align="center">AL × NU</p>
     <p align="center">NU × AL</p>
+    <p class="rule">LB 23ext: ditto.</p>
+    <p align="center">IDSP × PO</p>
     <p class="rule">LB 24: Do not break between prefix and letters or ideographs.</p>
     <p align="center">PR × ID</p>
     <p align="center">PR × AL</p>
     <p align="center">PO × AL</p>
+    <p class="rule">LB 24ext: ditto.</p>
+    <p align="center">PR × IDSP</p>
     <p class="rule">LB 25: Do not break between the following pairs of classes
       relevant to numbers:</p>
     <p align="center">( CL | NU ) × ( PO | PR )</p>
@@ -95,7 +103,7 @@
     <p align="center">( HY | IS | NU | SY ) × NU</p>
     <p class="rule">LB 25ext: ditto.</p>
     <p align="center">CLH × ( PO | PR )</p>
-    <p class="rule">LB 25exc: ...but allow break before opening punctuations with
+    <p class="rule">LB 25excSPOP: ...but allow break before opening punctuations with
       virtual glue.</p>
     <p align="center">( PO | PR ) ÷ SPOP</p>
     <p class="rule">LB 26: Do not break a Korean syllable.</p>
@@ -117,6 +125,9 @@
     <p align="center">CL × ( AL | NU )</p>
     <p class="rule">LB 30ext: ditto.</p>
     <p align="center">CLH × ( AL | NU )</p>
+    <p class="rule">LB 31excIDSP: Do not break between exclamation/question marks and
+      ideographic space.</p>
+    <p align="center">EX × IDSP</p>
     <p class="rule">LB 31: Break everywhere else.</p>
     <p align="center">ALL ÷ ALL</p>
   <h2>Line Breaking Class Pair Table</h2>
@@ -156,6 +167,7 @@
     <th style="text-align: center; font-weight: bold;">JL</th>
     <th style="text-align: center; font-weight: bold;">JV</th>
     <th style="text-align: center; font-weight: bold;">JT</th>
+    <th style="text-align: center; font-weight: bold;">IDSP</th>
     <th style="text-align: center; font-weight: bold;">SPOP</th>
     <th style="text-align: center; font-weight: bold;">CLH</th>
     <th style="text-align: center; font-weight: bold;">CLSP</th>
@@ -218,6 +230,8 @@
     <th style="text-align: center;" title="14: OP SP* × JV">^</th>
 
     <th style="text-align: center;" title="14: OP SP* × JT">^</th>
+
+    <th style="text-align: center;" title="14: OP SP* × IDSP">^</th>
 
     <th style="text-align: center;" title="14: OP SP* × SPOP">^</th>
 
@@ -282,6 +296,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: CL ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: CL ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: CL ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: CL × CLH ; 13ext: SP × CLH">^</th>
@@ -344,6 +360,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 19: QU × JV">%</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 19: QU × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 19: QU × IDSP">%</th>
 
     <th style="text-align: center;" title="15ext: QU SP* × SPOP">^</th>
 
@@ -408,6 +426,8 @@
 
     <th style="text-align: center;" title="12: GL × JT ; 18: SP ÷ JT">%</th>
 
+    <th style="text-align: center;" title="12: GL × IDSP ; 18: SP ÷ IDSP">%</th>
+
     <th style="text-align: center;" title="12: GL × SPOP ; 18: SP ÷ SPOP">%</th>
 
     <th style="text-align: center;" title="12: GL × CLH ; 13ext: SP × CLH">^</th>
@@ -470,6 +490,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 31: NS ÷ JV">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: NS ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: NS ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: NS ÷ SPOP">_</th>
 
@@ -534,6 +556,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: EX ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31excIDSP: EX × IDSP">%</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: EX ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: EX × CLH ; 13ext: SP × CLH">^</th>
@@ -596,6 +620,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 31: SY ÷ JV">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: SY ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: SY ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: SY ÷ SPOP">_</th>
 
@@ -660,6 +686,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: IS ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: IS ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: IS ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: IS × CLH ; 13ext: SP × CLH">^</th>
@@ -723,7 +751,9 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 27: PR × JT">%</th>
 
-    <th style="text-align: center;" title="18: SP ÷ SPOP ; 25exc: PR ÷ SPOP">_</th>
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 24ext: PR × IDSP">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 25excSPOP: PR ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: PR × CLH ; 13ext: SP × CLH">^</th>
 
@@ -786,7 +816,9 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: PO ÷ JT">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ SPOP ; 25exc: PO ÷ SPOP">_</th>
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: PO ÷ IDSP">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 25excSPOP: PO ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: PO × CLH ; 13ext: SP × CLH">^</th>
 
@@ -848,6 +880,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 31: NU ÷ JV">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: NU ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: NU ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: NU ÷ SPOP">_</th>
 
@@ -912,6 +946,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: AL ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: AL ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: AL ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: AL × CLH ; 13ext: SP × CLH">^</th>
@@ -974,6 +1010,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 31: ID ÷ JV">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: ID ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: ID ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: ID ÷ SPOP">_</th>
 
@@ -1038,6 +1076,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: IN ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: IN ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: IN ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: IN × CLH ; 13ext: SP × CLH">^</th>
@@ -1100,6 +1140,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 31: HY ÷ JV">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: HY ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: HY ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: HY ÷ SPOP">_</th>
 
@@ -1164,6 +1206,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: BA ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: BA ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: BA ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: BA × CLH ; 13ext: SP × CLH">^</th>
@@ -1226,6 +1270,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 21: BB × JV">%</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 21: BB × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 21: BB × IDSP">%</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 21: BB × SPOP">%</th>
 
@@ -1290,6 +1336,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: B2 ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: B2 ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: B2 ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: B2 × CLH ; 13ext: SP × CLH">^</th>
@@ -1352,6 +1400,8 @@
     <th style="text-align: center;" title="8: ZW ÷ JV ; 18: SP ÷ JV">_</th>
 
     <th style="text-align: center;" title="8: ZW ÷ JT ; 18: SP ÷ JT">_</th>
+
+    <th style="text-align: center;" title="8: ZW ÷ IDSP ; 18: SP ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="8: ZW ÷ SPOP ; 18: SP ÷ SPOP">_</th>
 
@@ -1416,6 +1466,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: CM ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: CM ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: CM ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: CM × CLH ; 13ext: SP × CLH">^</th>
@@ -1478,6 +1530,8 @@
     <th style="text-align: center;" title="11: WJ × JV ; 18: SP ÷ JV">%</th>
 
     <th style="text-align: center;" title="11: WJ × JT ; 18: SP ÷ JT">%</th>
+
+    <th style="text-align: center;" title="11: WJ × IDSP ; 18: SP ÷ IDSP">%</th>
 
     <th style="text-align: center;" title="11: WJ × SPOP ; 18: SP ÷ SPOP">%</th>
 
@@ -1542,6 +1596,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 26: H2 × JT">%</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: H2 ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: H2 ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: H2 × CLH ; 13ext: SP × CLH">^</th>
@@ -1604,6 +1660,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 31: H3 ÷ JV">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 26: H3 × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: H3 ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: H3 ÷ SPOP">_</th>
 
@@ -1668,6 +1726,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: JL ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: JL ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: JL ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: JL × CLH ; 13ext: SP × CLH">^</th>
@@ -1730,6 +1790,8 @@
     <th style="text-align: center;" title="18: SP ÷ JV ; 26: JV × JV">%</th>
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 26: JV × JT">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: JV ÷ IDSP">_</th>
 
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: JV ÷ SPOP">_</th>
 
@@ -1794,6 +1856,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 26: JT × JT">%</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: JT ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: JT ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: JT × CLH ; 13ext: SP × CLH">^</th>
@@ -1801,6 +1865,71 @@
     <th style="text-align: center;" title="13ext: JT × CLSP ; 13ext: SP × CLSP">^</th>
 
     <th style="text-align: center;" title="13ext: JT × CLHSP ; 13ext: SP × CLHSP">^</th>
+
+  <tr>
+    <th style="text-align: center; font-weight: bold;">IDSP</th>
+
+    <th style="text-align: center;" title="18: SP ÷ OP ; 31: IDSP ÷ OP">_</th>
+
+    <th style="text-align: center;" title="13: IDSP × CL ; 13: SP × CL">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ QU ; 19: IDSP × QU">%</th>
+
+    <th style="text-align: center;" title="12: IDSP × GL ; 18: SP ÷ GL">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NS ; 21: IDSP × NS">%</th>
+
+    <th style="text-align: center;" title="13: IDSP × EX ; 13: SP × EX">^</th>
+
+    <th style="text-align: center;" title="13: IDSP × SY ; 13: SP × SY">^</th>
+
+    <th style="text-align: center;" title="13: IDSP × IS ; 13: SP × IS">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PR ; 31: IDSP ÷ PR">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ PO ; 23ext: IDSP × PO">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ NU ; 31: IDSP ÷ NU">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ AL ; 31: IDSP ÷ AL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ ID ; 31: IDSP ÷ ID">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ IN ; 22ext: IDSP × IN">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ HY ; 21: IDSP × HY">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BA ; 21: IDSP × BA">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ BB ; 31: IDSP ÷ BB">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 31: IDSP ÷ B2">_</th>
+
+    <th style="text-align: center;" title="7: IDSP × ZW ; 7: SP × ZW">^</th>
+
+    <th style="text-align: center;" title="9: X CM* -&gt; X ; 18: SP ÷ CM">#</th>
+
+    <th style="text-align: center;" title="11: IDSP × WJ ; 11: SP × WJ">^</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 31: IDSP ÷ H2">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 31: IDSP ÷ H3">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JL ; 31: IDSP ÷ JL">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JV ; 31: IDSP ÷ JV">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ JT ; 31: IDSP ÷ JT">_</th>
+
+    <th style="text-align: center;" title="18excIDSP: IDSP × IDSP ; 18: SP ÷ IDSP">%</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: IDSP ÷ SPOP">_</th>
+
+    <th style="text-align: center;" title="13ext: IDSP × CLH ; 13ext: SP × CLH">^</th>
+
+    <th style="text-align: center;" title="13ext: IDSP × CLSP ; 13ext: SP × CLSP">^</th>
+
+    <th style="text-align: center;" title="13ext: IDSP × CLHSP ; 13ext: SP × CLHSP">^</th>
 
   <tr>
     <th style="text-align: center; font-weight: bold;">SPOP</th>
@@ -1856,6 +1985,8 @@
     <th style="text-align: center;" title="14ext: SPOP SP* × JV">^</th>
 
     <th style="text-align: center;" title="14ext: SPOP SP* × JT">^</th>
+
+    <th style="text-align: center;" title="14ext: SPOP SP* × IDSP">^</th>
 
     <th style="text-align: center;" title="14ext: SPOP SP* × SPOP">^</th>
 
@@ -1920,6 +2051,8 @@
 
     <th style="text-align: center;" title="18: SP ÷ JT ; 31: CLH ÷ JT">_</th>
 
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 31: CLH ÷ IDSP">_</th>
+
     <th style="text-align: center;" title="18: SP ÷ SPOP ; 31: CLH ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: CLH × CLH ; 13ext: SP × CLH">^</th>
@@ -1931,13 +2064,13 @@
   <tr>
     <th style="text-align: center; font-weight: bold;">CLSP</th>
 
-    <th style="text-align: center;" title="18: SP ÷ OP ; 18ext: CLSP ÷ OP">_</th>
+    <th style="text-align: center;" title="18: SP ÷ OP ; 18extCLSP: CLSP ÷ OP">_</th>
 
     <th style="text-align: center;" title="13: CLSP × CL ; 13: SP × CL">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ QU ; 18ext: CLSP ÷ QU">_</th>
+    <th style="text-align: center;" title="18: SP ÷ QU ; 18extCLSP: CLSP ÷ QU">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ GL ; 18ext: CLSP ÷ GL">_</th>
+    <th style="text-align: center;" title="18: SP ÷ GL ; 18extCLSP: CLSP ÷ GL">_</th>
 
     <th style="text-align: center;" title="16ext: CLSP SP* × NS">^</th>
 
@@ -1947,43 +2080,45 @@
 
     <th style="text-align: center;" title="13: CLSP × IS ; 13: SP × IS">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ PR ; 18ext: CLSP ÷ PR">_</th>
+    <th style="text-align: center;" title="18: SP ÷ PR ; 18extCLSP: CLSP ÷ PR">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ PO ; 18ext: CLSP ÷ PO">_</th>
+    <th style="text-align: center;" title="18: SP ÷ PO ; 18extCLSP: CLSP ÷ PO">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ NU ; 18ext: CLSP ÷ NU">_</th>
+    <th style="text-align: center;" title="18: SP ÷ NU ; 18extCLSP: CLSP ÷ NU">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ AL ; 18ext: CLSP ÷ AL">_</th>
+    <th style="text-align: center;" title="18: SP ÷ AL ; 18extCLSP: CLSP ÷ AL">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ ID ; 18ext: CLSP ÷ ID">_</th>
+    <th style="text-align: center;" title="18: SP ÷ ID ; 18extCLSP: CLSP ÷ ID">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ IN ; 18ext: CLSP ÷ IN">_</th>
+    <th style="text-align: center;" title="18: SP ÷ IN ; 18extCLSP: CLSP ÷ IN">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ HY ; 18ext: CLSP ÷ HY">_</th>
+    <th style="text-align: center;" title="18: SP ÷ HY ; 18extCLSP: CLSP ÷ HY">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ BA ; 18ext: CLSP ÷ BA">_</th>
+    <th style="text-align: center;" title="18: SP ÷ BA ; 18extCLSP: CLSP ÷ BA">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ BB ; 18ext: CLSP ÷ BB">_</th>
+    <th style="text-align: center;" title="18: SP ÷ BB ; 18extCLSP: CLSP ÷ BB">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ B2 ; 18ext: CLSP ÷ B2">_</th>
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 18extCLSP: CLSP ÷ B2">_</th>
 
     <th style="text-align: center;" title="7: CLSP × ZW ; 7: SP × ZW">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ CM ; 18ext: CLSP ÷ CM">_</th>
+    <th style="text-align: center;" title="18: SP ÷ CM ; 18extCLSP: CLSP ÷ CM">_</th>
 
     <th style="text-align: center;" title="11: CLSP × WJ ; 11: SP × WJ">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ H2 ; 18ext: CLSP ÷ H2">_</th>
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 18extCLSP: CLSP ÷ H2">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ H3 ; 18ext: CLSP ÷ H3">_</th>
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 18extCLSP: CLSP ÷ H3">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ JL ; 18ext: CLSP ÷ JL">_</th>
+    <th style="text-align: center;" title="18: SP ÷ JL ; 18extCLSP: CLSP ÷ JL">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ JV ; 18ext: CLSP ÷ JV">_</th>
+    <th style="text-align: center;" title="18: SP ÷ JV ; 18extCLSP: CLSP ÷ JV">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ JT ; 18ext: CLSP ÷ JT">_</th>
+    <th style="text-align: center;" title="18: SP ÷ JT ; 18extCLSP: CLSP ÷ JT">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ SPOP ; 18ext: CLSP ÷ SPOP">_</th>
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 18extCLSP: CLSP ÷ IDSP">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 18extCLSP: CLSP ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: CLSP × CLH ; 13ext: SP × CLH">^</th>
 
@@ -1994,13 +2129,13 @@
   <tr>
     <th style="text-align: center; font-weight: bold;">CLHSP</th>
 
-    <th style="text-align: center;" title="18: SP ÷ OP ; 18ext: CLHSP ÷ OP">_</th>
+    <th style="text-align: center;" title="18: SP ÷ OP ; 18extCLSP: CLHSP ÷ OP">_</th>
 
     <th style="text-align: center;" title="13: CLHSP × CL ; 13: SP × CL">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ QU ; 18ext: CLHSP ÷ QU">_</th>
+    <th style="text-align: center;" title="18: SP ÷ QU ; 18extCLSP: CLHSP ÷ QU">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ GL ; 18ext: CLHSP ÷ GL">_</th>
+    <th style="text-align: center;" title="18: SP ÷ GL ; 18extCLSP: CLHSP ÷ GL">_</th>
 
     <th style="text-align: center;" title="16ext: CLHSP SP* × NS">^</th>
 
@@ -2010,43 +2145,45 @@
 
     <th style="text-align: center;" title="13: CLHSP × IS ; 13: SP × IS">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ PR ; 18ext: CLHSP ÷ PR">_</th>
+    <th style="text-align: center;" title="18: SP ÷ PR ; 18extCLSP: CLHSP ÷ PR">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ PO ; 18ext: CLHSP ÷ PO">_</th>
+    <th style="text-align: center;" title="18: SP ÷ PO ; 18extCLSP: CLHSP ÷ PO">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ NU ; 18ext: CLHSP ÷ NU">_</th>
+    <th style="text-align: center;" title="18: SP ÷ NU ; 18extCLSP: CLHSP ÷ NU">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ AL ; 18ext: CLHSP ÷ AL">_</th>
+    <th style="text-align: center;" title="18: SP ÷ AL ; 18extCLSP: CLHSP ÷ AL">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ ID ; 18ext: CLHSP ÷ ID">_</th>
+    <th style="text-align: center;" title="18: SP ÷ ID ; 18extCLSP: CLHSP ÷ ID">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ IN ; 18ext: CLHSP ÷ IN">_</th>
+    <th style="text-align: center;" title="18: SP ÷ IN ; 18extCLSP: CLHSP ÷ IN">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ HY ; 18ext: CLHSP ÷ HY">_</th>
+    <th style="text-align: center;" title="18: SP ÷ HY ; 18extCLSP: CLHSP ÷ HY">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ BA ; 18ext: CLHSP ÷ BA">_</th>
+    <th style="text-align: center;" title="18: SP ÷ BA ; 18extCLSP: CLHSP ÷ BA">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ BB ; 18ext: CLHSP ÷ BB">_</th>
+    <th style="text-align: center;" title="18: SP ÷ BB ; 18extCLSP: CLHSP ÷ BB">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ B2 ; 18ext: CLHSP ÷ B2">_</th>
+    <th style="text-align: center;" title="18: SP ÷ B2 ; 18extCLSP: CLHSP ÷ B2">_</th>
 
     <th style="text-align: center;" title="7: CLHSP × ZW ; 7: SP × ZW">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ CM ; 18ext: CLHSP ÷ CM">_</th>
+    <th style="text-align: center;" title="18: SP ÷ CM ; 18extCLSP: CLHSP ÷ CM">_</th>
 
     <th style="text-align: center;" title="11: CLHSP × WJ ; 11: SP × WJ">^</th>
 
-    <th style="text-align: center;" title="18: SP ÷ H2 ; 18ext: CLHSP ÷ H2">_</th>
+    <th style="text-align: center;" title="18: SP ÷ H2 ; 18extCLSP: CLHSP ÷ H2">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ H3 ; 18ext: CLHSP ÷ H3">_</th>
+    <th style="text-align: center;" title="18: SP ÷ H3 ; 18extCLSP: CLHSP ÷ H3">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ JL ; 18ext: CLHSP ÷ JL">_</th>
+    <th style="text-align: center;" title="18: SP ÷ JL ; 18extCLSP: CLHSP ÷ JL">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ JV ; 18ext: CLHSP ÷ JV">_</th>
+    <th style="text-align: center;" title="18: SP ÷ JV ; 18extCLSP: CLHSP ÷ JV">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ JT ; 18ext: CLHSP ÷ JT">_</th>
+    <th style="text-align: center;" title="18: SP ÷ JT ; 18extCLSP: CLHSP ÷ JT">_</th>
 
-    <th style="text-align: center;" title="18: SP ÷ SPOP ; 18ext: CLHSP ÷ SPOP">_</th>
+    <th style="text-align: center;" title="18: SP ÷ IDSP ; 18extCLSP: CLHSP ÷ IDSP">_</th>
+
+    <th style="text-align: center;" title="18: SP ÷ SPOP ; 18extCLSP: CLHSP ÷ SPOP">_</th>
 
     <th style="text-align: center;" title="13ext: CLHSP × CLH ; 13ext: SP × CLH">^</th>
 

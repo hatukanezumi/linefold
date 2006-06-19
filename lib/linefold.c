@@ -2,9 +2,16 @@
  * An implementation of line breaking algorithm described in
  * Unicode Standard Annex #14 (UAX#14).
  *
- * Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
- * redistributed under GNU General Public License version 2 (or later
- * version you prefer).
+ * Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+ *
+ * This file is part of the Linefold Package.  This program is free
+ * software; you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option)
+ * any later version.  This program is distributed in the hope that
+ * it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the COPYING file for more details.
  * 
  * $Id$
  */
@@ -13,24 +20,27 @@
 #include "common.h"
 #include "linefold.h"
 
-static size_t find_linebreak(size_t, linefold_class *,
-			     linefold_action *, linefold_flags);
+static size_t
+find_linebreak(size_t, linefold_class *, linefold_action *, linefold_flags);
+static int
+charsetcmp(const char *, const char *);
 
 /*
  * Public Functions
  */
 
 /* Allocate line break informations. */
-struct linefold_info
-*linefold_alloc(unicode_char *text, size_t textlen,
-		linefold_lbprop_funcptr
-		(*find_lbprop_func)(const char *, linefold_flags),
-		void (*tailor_lbprop)(unicode_char, int *, linefold_class *,
-				      linefold_flags),
-		const char *chset, linefold_flags flags)
+struct linefold_info *
+linefold_alloc(const linefold_char *text, size_t textlen,
+	       linefold_lbprop_funcptr
+	       (*find_lbprop_func)(const char *, linefold_flags),
+	       void (*tailor_lbprop)(linefold_char,
+				     linefold_width *, linefold_class *,
+				     linefold_flags),
+	       const char *chset, linefold_flags flags)
 {
   struct linefold_info *lbinfo;
-  int *widths;
+  linefold_width *widths;
   linefold_class *lbclasses;
   linefold_action *lbactions;
   char *charset=NULL;
@@ -40,7 +50,7 @@ struct linefold_info
   if (text == NULL || textlen == 0)
     return NULL;
 
-  if ((widths = malloc(sizeof(int) * textlen)) == NULL) {
+  if ((widths = malloc(sizeof(linefold_width) * textlen)) == NULL) {
     return NULL;
   }
   if ((lbclasses = malloc(sizeof(linefold_class) * textlen)) == NULL) {
@@ -52,11 +62,15 @@ struct linefold_info
     free(lbclasses);
     return NULL;
   }
-  if (chset && (charset = strdup(chset)) == NULL) {
-    free(widths);
-    free(lbclasses);
-    free(lbactions);
-    return NULL;
+  if (chset && *chset) {
+    if ((charset = malloc(strlen(chset)+1)) == NULL) {
+      free(widths);
+      free(lbclasses);
+      free(lbactions);
+      return NULL;
+    } else {
+      memcpy(charset, chset, strlen(chset)+1);
+    }
   }
   if ((lbinfo = malloc(sizeof(struct linefold_info))) == NULL) {
     free(widths);
@@ -92,6 +106,7 @@ struct linefold_info
   lbinfo->charset = charset;
   lbinfo->length = textlen;
   lbinfo->flags = flags;
+  lbinfo->linp = lbinfo->lint = lbinfo->pint = 0;
   return lbinfo;
 }
 
@@ -101,27 +116,26 @@ void linefold_free(struct linefold_info *lbinfo)
   if (lbinfo == NULL)
     return;
 
-  free(lbinfo->widths);
-  free(lbinfo->lbclasses);
-  free(lbinfo->lbactions);
-  if (lbinfo->charset) free(lbinfo->charset);
+  free((void *)lbinfo->widths);
+  free((void *)lbinfo->lbclasses);
+  free((void *)lbinfo->lbactions);
+  if (lbinfo->charset) free((void *)lbinfo->charset);
   free(lbinfo);
 }
 
 /* Do line breaking */
 linefold_action
-linefold(struct linefold_info *lbinfo, unicode_char *text,
-	 int (*is_line_exceeded)(struct linefold_info *,
-				 unicode_char *,
-				 size_t, size_t, int, void *),
-	 void (*writeout_cb)(struct linefold_info *,
-			     unicode_char *,
-			     size_t, size_t, linefold_action,
-			     void *),
-	 int maxlen, void *voidarg)
+linefold(struct linefold_info *lbinfo, linefold_char *text,
+	 int (*is_line_exceeded)(const struct linefold_info *,
+				 const linefold_char *,
+				 size_t, size_t, size_t, void *),
+	 void (*writeout_cb)(const struct linefold_info *,
+			     const linefold_char *,
+			     size_t, size_t, linefold_action, void *),
+	 size_t maxlen, void *voidarg)
 {
   size_t textlen;
-  linefold_action *lbactions;
+  const linefold_action *lbactions;
   linefold_flags flags;
   linefold_action global_action=LINEFOLD_ACTION_NOMOD,
     action, prevaction;
@@ -134,7 +148,7 @@ linefold(struct linefold_info *lbinfo, unicode_char *text,
   flags = lbinfo->flags;
 
   if (is_line_exceeded == NULL)
-    is_line_exceeded = &linefold_check_length;
+    is_line_exceeded = &linefold_is_line_exceeded;
 
   while (i < textlen) {
     prevaction = LINEFOLD_ACTION_PROHIBITED;
@@ -205,6 +219,16 @@ linefold(struct linefold_info *lbinfo, unicode_char *text,
 	prevaction = action;
       }
     }
+    /* update line indice */
+    if (action == LINEFOLD_ACTION_EXPLICIT ||
+	action == LINEFOLD_ACTION_EOT) {
+      lbinfo->linp = 0;
+      lbinfo->lint++;
+      lbinfo->pint++;
+    } else {
+      lbinfo->linp++;
+      lbinfo->lint++;
+    }
   }
 
   return global_action;
@@ -221,180 +245,167 @@ linefold_find_lbprop_func(const char *chset, linefold_flags flags)
 {
   if (chset == NULL || flags & LINEFOLD_OPTION_GENERIC_WIDTH)
     return &linefold_getprop_generic;
-  else if (strcasecmp(chset, "BIG5")==0 ||
-	   strcasecmp(chset, "BIG5-HKSCS")==0 ||
-	   strcasecmp(chset, "EUC-TW")==0 ||
-	   strcasecmp(chset, "CP950")==0)
+  else if (charsetcmp(chset, "BIG5")==0 ||
+	   charsetcmp(chset, "BIG5-HKSCS")==0 ||
+	   charsetcmp(chset, "EUC-TW")==0 ||
+	   charsetcmp(chset, "CP950")==0)
     return &linefold_getprop_C;
-  else if (strcasecmp(chset, "EUC-CN")==0 ||
-	   strcasecmp(chset, "ISO-2022-CN")==0 ||
-	   strcasecmp(chset, "ISO-2022-CN-EXT")==0 ||
-	   strcasecmp(chset, "GB2312")==0 ||
-	   strcasecmp(chset, "GBK")==0 ||
-	   strcasecmp(chset, "GB18030")==0 ||
-	   strcasecmp(chset, "CP936")==0)
+  else if (charsetcmp(chset, "EUC-CN")==0 ||
+	   charsetcmp(chset, "ISO-2022-CN")==0 ||
+	   charsetcmp(chset, "ISO-2022-CN-EXT")==0 ||
+	   charsetcmp(chset, "HZ")==0 ||
+	   charsetcmp(chset, "HZ-GB-2312")==0 ||
+	   charsetcmp(chset, "GB2312")==0 ||
+	   charsetcmp(chset, "GBK")==0 ||
+	   charsetcmp(chset, "GB18030")==0 ||
+	   charsetcmp(chset, "CP936")==0)
     return &linefold_getprop_G;
-  else if (strcasecmp(chset, "ISO-2022-JP")==0 ||
-	   strcasecmp(chset, "ISO-2022-JP-1")==0 ||
-	   strcasecmp(chset, "ISO-2022-JP-2")==0 ||
-	   strcasecmp(chset, "ISO-2022-JP-3")==0 ||
-	   strcasecmp(chset, "ISO-2022-JP-3-PLANE1")==0 ||
-	   strcasecmp(chset, "ISO-2022-JP-2004")==0 ||
-	   strcasecmp(chset, "ISO-2022-JP-2004-PLANE1")==0 ||
-	   strcasecmp(chset, "EUC-JP")==0 ||
-	   strcasecmp(chset, "EUC-JISX0213")==0 ||
-	   strcasecmp(chset, "EUC-JISX0213-PLANE1")==0 ||
-	   strcasecmp(chset, "EUC-JIS-2004")==0 ||
-	   strcasecmp(chset, "EUC-JIS-2004-PLANE1")==0 ||
-	   strcasecmp(chset, "SHIFT_JIS")==0 ||
-	   strcasecmp(chset, "SHIFT_JISX0213")==0 ||
-	   strcasecmp(chset, "SHIFT_JISX0213-PLANE1")==0 ||
-	   strcasecmp(chset, "SHIFT_JIS-2004")==0 ||
-	   strcasecmp(chset, "SHIFT_JIS-2004-PLANE1")==0 ||
-	   strcasecmp(chset, "CP932")==0)
+  else if (charsetcmp(chset, "ISO-2022-JP")==0 ||
+	   charsetcmp(chset, "ISO-2022-JP-1")==0 ||
+	   charsetcmp(chset, "ISO-2022-JP-2")==0 ||
+	   charsetcmp(chset, "ISO-2022-JP-3")==0 ||
+	   charsetcmp(chset, "ISO-2022-JP-3-PLANE1")==0 ||
+	   charsetcmp(chset, "ISO-2022-JP-2004")==0 ||
+	   charsetcmp(chset, "ISO-2022-JP-2004-PLANE1")==0 ||
+	   charsetcmp(chset, "EUC-JP")==0 ||
+	   charsetcmp(chset, "EUC-JISX0213")==0 ||
+	   charsetcmp(chset, "EUC-JISX0213-PLANE1")==0 ||
+	   charsetcmp(chset, "EUC-JIS-2004")==0 ||
+	   charsetcmp(chset, "EUC-JIS-2004-PLANE1")==0 ||
+	   charsetcmp(chset, "SHIFT_JIS")==0 ||
+	   charsetcmp(chset, "SHIFT_JISX0213")==0 ||
+	   charsetcmp(chset, "SHIFT_JISX0213-PLANE1")==0 ||
+	   charsetcmp(chset, "SHIFT_JIS-2004")==0 ||
+	   charsetcmp(chset, "SHIFT_JIS-2004-PLANE1")==0 ||
+	   charsetcmp(chset, "CP932")==0)
     return &linefold_getprop_J;
-  else if (strcasecmp(chset, "ISO-2022-KR")==0 ||
-	   strcasecmp(chset, "EUC-KR")==0 ||
-	   strcasecmp(chset, "CP949")==0 ||
-	   strcasecmp(chset, "KS_C_5601-1987")==0)
+  else if (charsetcmp(chset, "ISO-2022-KR")==0 ||
+	   charsetcmp(chset, "EUC-KR")==0 ||
+	   charsetcmp(chset, "CP949")==0 ||
+	   charsetcmp(chset, "UHC")==0 ||
+	   charsetcmp(chset, "KS_C_5601-1987")==0)
     return &linefold_getprop_K;
   else
     return &linefold_getprop_generic;
 }
 
+static int
+charsetcmp(const char *s1, const char *s2)
+{
+  unsigned char c1, c2;
+
+  while ((c1 = (unsigned char)*s1) && (c2 = (unsigned char)*s2)) {
+    while (c1 && !('0' <= c1 && c1 <= '9') &&
+	   !('A' <= c1 && c1 <= 'Z') && !('a' <= c1 && c1 <= 'z'))
+      c1 = (unsigned char)*(++s1);
+    while (c2 && !('0' <= c2 && c2 <= '9') &&
+	   !('A' <= c2 && c2 <= 'Z') && !('a' <= c2 && c2 <= 'z'))
+      c2 = (unsigned char)*(++s2);
+    if (!c1 || !c2)
+      return c1 - c2;
+
+    if (('a' <= c1 && c1 <= 'z'))
+      c1 -= 'a'-'A';
+    if ('a' <= c2 && c2 <= 'z')
+      c2 -= 'a'-'A';
+    if (c1 != c2) return c1 - c2;
+    s1++;
+    s2++;
+  }
+  return (unsigned char)*s1 - (unsigned char)*s2;
+}
+
+
 /* Internal default of functin to tailor character property. */
 void
-linefold_tailor_lbprop(unicode_char c, int *widthptr, linefold_class *lbcptr,
+linefold_tailor_lbprop(linefold_char c,
+		       linefold_width *widthptr, linefold_class *lbcptr,
 		       linefold_flags flags)
 {
-  int width = *widthptr;
+  linefold_width width = *widthptr;
   linefold_class lbc = *lbcptr;
 
   if (flags & LINEFOLD_OPTION_NARROW_LATIN &&
       width == 2 &&
-      (unicode_char)0x00C0 <= c && c <= (unicode_char)0x01FF &&
-      (unicode_char)0x00D7 != c && (unicode_char)0x00F7 != c)
+      (linefold_char)0x00C0 <= c && c <= (linefold_char)0x01FF &&
+      (linefold_char)0x00D7 != c && (linefold_char)0x00F7 != c)
     width = 1;
   else if (flags & LINEFOLD_OPTION_NARROW_GREEK &&
 	   width == 2 &&
-	   (unicode_char)0x0370 <= c && c <= (unicode_char)0x03FF)
+	   (linefold_char)0x0370 <= c && c <= (linefold_char)0x03FF)
     width = 1;
   else if (flags & LINEFOLD_OPTION_NARROW_CYRILLIC &&
 	   width == 2 &&
-	   (unicode_char)0x0400 <= c && c <= (unicode_char)0x04FF)
+	   (linefold_char)0x0400 <= c && c <= (linefold_char)0x04FF)
     width = 1;
 
-#ifdef LINEFOLD_CLASS_HY
   if (lbc == LINEFOLD_CLASS_HY && /* HYPHEN-MINUS */
       !(flags & LINEFOLD_OPTION_BREAK_HY))
     lbc = LINEFOLD_CLASS_AL;
-#endif
 
-#ifdef LINEFOLD_CLASS_GL
-  if (c == (unicode_char)0x00AD && /* SOFT HYPHEN */
+  if (c == (linefold_char)0x00AD && /* SOFT HYPHEN */
       !(flags & LINEFOLD_OPTION_BREAK_SOFT_HYPHEN))
     lbc = LINEFOLD_CLASS_GL;
-#endif
 
-  switch (lbc) {
-  case LINEFOLD_CLASS_NL:
+  if (lbc == LINEFOLD_CLASS_NL) {
     if (flags & LINEFOLD_OPTION_NOBREAK_NL)
       lbc = LINEFOLD_CLASS_CM;
     else
       lbc = LINEFOLD_CLASS_BK;
-    break;
-
-#ifdef LINEFOLD_CLASS_CLH
-#ifdef LINEFOLD_CLASS_CL
-  case LINEFOLD_CLASS_CLH:
+  } else if (lbc == LINEFOLD_CLASS_CLH) {
     if (flags & LINEFOLD_OPTION_NOHUNG_PUNCT)
       lbc = LINEFOLD_CLASS_CL;
-    break;
-#endif
-#endif
-
-#ifdef LINEFOLD_CLASS_CLSP
-#ifdef LINEFOLD_CLASS_CL
-  case LINEFOLD_CLASS_CLSP:
+  } else if (lbc == LINEFOLD_CLASS_CLSP) {
     if (flags & LINEFOLD_OPTION_NOGLUE_PUNCT)
       lbc = LINEFOLD_CLASS_CL;
-    break;
-#endif
-#endif
-
-#ifdef LINEFOLD_CLASS_CLHSP
-#ifdef LINEFOLD_CLASS_CL
-  case LINEFOLD_CLASS_CLHSP:
+  } else if (lbc == LINEFOLD_CLASS_CLHSP) {
     if (flags & LINEFOLD_OPTION_NOGLUE_PUNCT) {
-#  ifdef LINEFOLD_CLASS_CLH
       if (flags & LINEFOLD_OPTION_NOHUNG_PUNCT)
 	lbc = LINEFOLD_CLASS_CL;
       else
 	lbc = LINEFOLD_CLASS_CLH;
-#  else
-      lbc = LINEFOLD_CLASS_CL;
-#  endif
     } else if (flags & LINEFOLD_OPTION_NOHUNG_PUNCT)
-#  ifdef LINEFOLD_CLASS_CLSP
       lbc = LINEFOLD_CLASS_CLSP;
-#  else
-    lbc = LINEFOLD_CLASS_CL;
-#  endif
-    break;
-#endif
-#endif
-
-#ifdef LINEFOLD_CLASS_SPOP
-#ifdef LINEFOLD_CLASS_OP
-  case LINEFOLD_CLASS_SPOP:
+  } else if (lbc == LINEFOLD_CLASS_SPOP) {
     if (flags & LINEFOLD_OPTION_NOGLUE_PUNCT)
       lbc = LINEFOLD_CLASS_OP;
-    break;
-#endif
-#endif
-
-#ifdef LINEFOLD_CLASS_BKO
-#ifdef LINEFOLD_CLASS_CM
-  case LINEFOLD_CLASS_BKO:
+#ifdef LINEFOLD_CLASS_BKVT
+  } else if (lbc == LINEFOLD_CLASS_BKVT) {
     if (flags & LINEFOLD_OPTION_NOBREAK_VT)
       lbc = LINEFOLD_CLASS_CM;
     else
       lbc = LINEFOLD_CLASS_BK;
-    break;
 #endif
+#ifdef LINEFOLD_CLASS_BKFF
+  } else if (lbc == LINEFOLD_CLASS_BKFF) {
+    if (flags & LINEFOLD_OPTION_NOBREAK_FF)
+      lbc = LINEFOLD_CLASS_CM;
+    else
+      lbc = LINEFOLD_CLASS_BK;
 #endif
-
-#ifdef LINEFOLD_CLASS_IDSP
-#ifdef LINEFOLD_CLASS_ID
-  case LINEFOLD_CLASS_IDSP:
+  } else if (lbc == LINEFOLD_CLASS_IDSP) {
     if (flags & LINEFOLD_OPTION_IDSP_IS_SP)
       lbc = LINEFOLD_CLASS_SP;
-    else
-      lbc = LINEFOLD_CLASS_ID;
-    break;
-#endif
-#endif
-
 #ifdef LINEFOLD_CLASS_NSK
-#ifdef LINEFOLD_CLASS_ID
-#ifdef LINEFOLD_CLASS_NS
-  case LINEFOLD_CLASS_NSK:
+  } else if (lbc == LINEFOLD_CLASS_NSK) {
     if (flags & LINEFOLD_OPTION_RELAX_KANA_NS)
       lbc = LINEFOLD_CLASS_ID;
     else
       lbc = LINEFOLD_CLASS_NS;
-    break;
 #endif
-#endif
-#endif
-
 #ifdef LINEFOLD_CLASS_OPAL
-  case LINEFOLD_CLASS_OPAL:
+  } else if (lbc == LINEFOLD_CLASS_OPAL) {
     if (flags & LINEFOLD_OPTION_OPAL_IS_AL)
       lbc = LINEFOLD_CLASS_AL;
     else
       lbc = LINEFOLD_CLASS_OP;
-    break;
+#endif
+#ifdef LINEFOLD_CLASS_INB2
+  } else if (lbc == LINEFOLD_CLASS_INB2) {
+    if (flags & LINEFOLD_OPTION_INB2_IS_B2)
+      lbc = LINEFOLD_CLASS_B2;
+    else
+      lbc = LINEFOLD_CLASS_IN;
 #endif
   }
 
@@ -403,10 +414,10 @@ linefold_tailor_lbprop(unicode_char c, int *widthptr, linefold_class *lbcptr,
   return;
 }
 
-static size_t find_linebreak(size_t textlen,
-			     linefold_class *lbclasses,
-			     linefold_action *lbactions,
-			     linefold_flags flags)
+static size_t
+find_linebreak(size_t textlen,
+	       linefold_class *lbclasses, linefold_action *lbactions,
+	       linefold_flags flags)
 {
   linefold_class before; /* class of 'before' character */
   linefold_class after;
@@ -518,78 +529,59 @@ static size_t find_linebreak(size_t textlen,
 
 /* Internal default of function to check if length of a line exceeds
    limit. */
-int linefold_check_length(struct linefold_info *lbinfo,
-			  unicode_char *text,
-			  size_t start, size_t len, int maxlen,
+int
+linefold_is_line_exceeded(const struct linefold_info *lbinfo,
+			  const linefold_char *text,
+			  size_t start, size_t len, size_t maxlen,
 			  void *voidarg)
 {
   size_t end = start + len;
-  int *widths = lbinfo->widths;
-  linefold_class *lbclasses = lbinfo->lbclasses;
+  const linefold_width *widths = lbinfo->widths;
+  const linefold_class *lbclasses = lbinfo->lbclasses;
   linefold_flags flags = lbinfo->flags;
-
-  size_t i;
-  int length = 0;
-  int real_length = 0;
+  size_t i, length = 0, real_length = 0;
 
   for (i=start; i < end; i++) {
-    switch (lbclasses[i]) {
-    case LINEFOLD_CLASS_SP:
-    case LINEFOLD_CLASS_BK:
-    case LINEFOLD_CLASS_CR:
-    case LINEFOLD_CLASS_LF:
-    case LINEFOLD_CLASS_NL:
-      break;
+    linefold_class lbc = lbclasses[i];
+    //switch (lbclasses[i]) {
+    if (lbc == LINEFOLD_CLASS_SP ||
+	lbc == LINEFOLD_CLASS_BK ||
+	lbc == LINEFOLD_CLASS_CR ||
+	lbc == LINEFOLD_CLASS_LF ||
+	lbc == LINEFOLD_CLASS_NL) {
+      /* skip */;
 
-#ifdef LINEFOLD_CLASS_JL
-#ifdef LINEFOLD_CLASS_JV
-#ifdef LINEFOLD_CLASS_JT
       /* Convention for Hangul combining jamo.
        * choseong+jungseong or choseong+jungseong+jongseong
        * is single Wide character.
        */
-    case LINEFOLD_CLASS_JV:
+    } else if (lbc == LINEFOLD_CLASS_JV) {
       if (!(flags & LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO) &&
 	  i >= start+1 && lbclasses[i-1] == LINEFOLD_CLASS_JL)
 	real_length -= widths[i];
       else
 	length += widths[i];
-      break;
 
-    case LINEFOLD_CLASS_JT:
+    } else if (lbc == LINEFOLD_CLASS_JT) {
       if (!(flags & LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO) &&
 	  i >= start+2 && lbclasses[i-2] == LINEFOLD_CLASS_JL &&
 	  lbclasses[i-1] == LINEFOLD_CLASS_JV)
 	real_length -= widths[i];
       else
 	length += widths[i];
-      break;
-#endif
-#endif
-#endif
 
-#if defined(LINEFOLD_CLASS_CLH) || defined(LINEFOLD_CLASS_CLHSP)
-#  ifdef LINEFOLD_CLASS_CLH
-    case LINEFOLD_CLASS_CLH:
-#  endif
-#  ifdef LINEFOLD_CLASS_CLHSP
-    case LINEFOLD_CLASS_CLHSP:
-#  endif
+    } else if (lbc == LINEFOLD_CLASS_CLH ||
+	       lbc == LINEFOLD_CLASS_CLHSP) {
       if (real_length > maxlen)
 	length = real_length + widths[i];
-      break;
-#endif
 
-#ifdef LINEFOLD_CLASS_CLSP
-    case LINEFOLD_CLASS_CLSP:
+    } else if (lbc == LINEFOLD_CLASS_CLSP) {
       if (real_length > maxlen - (widths[i] - 1))
 	length = real_length + widths[i];
       else
 	length += widths[i]-1;
-      break;
-#endif
 
-    default:
+    } else {
       length = real_length + widths[i];
     }
     real_length += widths[i];

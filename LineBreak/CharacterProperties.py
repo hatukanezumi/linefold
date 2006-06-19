@@ -5,22 +5,36 @@
 CharacterProperties.py - Customizations of UAX#14 Line Breaking
 Properties and UAX#11 East Asian Width.
 
-Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
-redistributed under GNU General Public License version 2 (or later
-version you prefer).
+Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+
+This file is part of the Linefold Package.  This program is free
+software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.  This program is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+COPYING file for more details.
 
 $Id$
 """
 
 def customize(propmap):
     ## Revisions between rev. 17 (data version 4.1.0) and 18 (data version
-    ## 5.0.0d6) of UAX#14.
+    ## 5.0.0d7) of UAX#14.  Note: Only modifications of classification
+    ## are followed.  Added characters are not followed.
 
     propmap.update( {
-        0x000B: (1, 'BKO'), # <control> vertical tab (tailorable) [CM]
+        0x000B: (1, 'BKVT'), # <control> vertical tab (tailorable) [CM]
         0x035C: (1, 'GL'), # COMBINING DOUBLE BREVE BELOW [CM]
+        0x05BE: (1, 'BA'), # HEBREW PUNCTUATION MAQAF [AL]
         0x1735: (1, 'BA'), # PHILIPPINE SINGLE PUNCTUATION [AL]
         0x1736: (1, 'BA'), # PHILIPPINE DOUBLE PUNCTUATION [AL]
+        0x17D9: (1, 'AL'), # KHMER SIGN PHNAEK MUAN [NS]
+        0x203D: (1, 'NS'), # INTERROBANG [AL]
+        0x2047: (1, 'NS'), # DOUBLE QUESTION MARK [AL]
+        0x2048: (1, 'NS'), # QUESTION EXCLAMATION MARK [AL]
+        0x2049: (1, 'NS'), # EXCLAMATION QUESTION MARK [AL]
         0x23B4: (1, 'AL'), # TOP SQUARE BRACKET [OP]
         0x23B5: (1, 'AL'), # BOTTOM SQUARE BRACKET [CL]
         0x23B6: (1, 'AL'), # BOTTOM SQUARE BRACKET OVER TOP SQUARE BRACKET [QU]
@@ -42,12 +56,13 @@ def customize(propmap):
             propmap[k] = (2, v[1])
         
     # Compatibilities between UAX#14 and JIS X 4051.
-    # - EM DASH is classified B2 by UAX but ``分離禁止文字'' (inseparable
-    #   characters) by JIS.  So vertical form may be IN and narrow form
-    #   may be B2.
-    # - TWO DOT LEADER is classified IN and ``inseparable characters'' so
-    #   vertical form might be also IN.  EN DASH is BA by UAX and ``ハイフ
-    #   ン類'' (hyphen class) by JIS, so vertical form might be also BA.
+    # - EM DASH is classified B2 by UAX and ``分離禁止文字'' (inseparable
+    #   characters) by JIS.  So vertical form also may be B2 [1.0beta2].
+    # - TWO DOT LEADER and HORIZONTAL ELLIPSIS are classified IN by UAX
+    #   but ``inseparable characters'' by JIS. So they and their vertical
+    #   forms might be B2 (tailorable) [1.0beta2].
+    # - EN DASH is BA by UAX and ``ハイフン類'' (hyphen class) by JIS, so
+    #   vertical form is also BA.
     # - Compound exclamations/questions are classified ``区切り約物''
     #   (separating symbols) by JIS, acompany with single exclamation /
     #   question signs.
@@ -59,14 +74,17 @@ def customize(propmap):
     # About these customizations viewed from JIS side, see
     # http://hatuka.nezumi.nu/log/2006/05/uax14_vs_jisx4051.html
     propmap.update( {
+        0x2025: (1, 'INB2'), # TWO DOT LEADER
+        0x2026: (1, 'INB2'), # HORIZONTAL ELLIPSIS
         0x203C: (1, 'EX'), # DOUBLE EXCLAMATION MARK
         0x203D: (1, 'EX'), # INTERROBANG
         0x2047: (1, 'EX'), # DOUBLE QUESTION MARK
         0x2048: (1, 'EX'), # QUESTION EXCLAMATION MARK
         0x2049: (1, 'EX'), # EXCLAMATION QUESTION MARK
+        0xFE19: (2, 'INB2'), # PRESENTATION FORM FOR VERTICAL HORIZONTAL ELLIPSIS
         0xFE32: (2, 'BA'), # PRESENTATION FORM FOR VERTICAL EN DASH
-        0xFE31: (2, 'IN'), # PRESENTATION FORM FOR VERTICAL EM DASH
-        0xFE30: (2, 'IN'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
+        0xFE31: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL EM DASH
+        0xFE30: (2, 'INB2'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
         0x3033: (2, 'IN'), # VERTICAL KANA REPEAT MARK UPPER HALF
         0x3034: (2, 'IN'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
         0x3035: (2, 'IN'), # VERTICAL KANA REPEAT MARK LOWER HALF
@@ -142,12 +160,13 @@ def customize(propmap):
         0xFF9F: (1, 'AL'), # HALFWIDTH KATAKANA SEMI-VOICED SOUND MARK
         } )
 
-    # In japanese line folding, comma and full stop can be protrude into
-    # the right margin (``ぶら下げ''; hunging punctuation) so that ``widow
-    # characters'' are reduced or simply aesthetism is satisfied.  We
-    # apply this custom to Ideographic and Fullwidth Latin ones (this
-    # behavior may be tailored).  To support these features, extended
-    # line breaking classes are introduced (about CLHSP see also below).
+    # In traditional East Asian line folding, comma and full stop can
+    # be protrude into the right margin (``ぶら下げ''; hunging
+    # punctuation) so that ``widow characters'' are reduced or simply
+    # aesthetism is satisfied.  We apply this custom to Ideographic
+    # and Fullwidth Latin ones (this behavior may be tailored).  To
+    # support these features, extended line breaking classes are
+    # introduced (about CLHSP see also below).
     propmap.update( {
         0x3001: (2, 'CLHSP'), # IDEOGRAPHIC COMMA
         0x3002: (2, 'CLHSP'), # IDEOGRAPHIC FULL STOP
@@ -171,8 +190,13 @@ def customize(propmap):
             elif v[1] == 'CL':
                 propmap[k] = (v[0], 'CLSP')
 
-    # Usually IDEOGRAPHIC SPACE behaves as ID.  But sometime it
-    # behaves as SP (this may be tailored).
+    # Usually IDEOGRAPHIC SPACE behaves as ID.  But in japanese
+    # typsetting custom, exclamation/question marks are followed by a
+    # space with width of one character (i.e. Wide space); IDEOGRAPHIC
+    # SPACE is often used.  So don't break between EX and IDEOGRAPHIC
+    # SPACE.  IDEOGRAPHIC SPACE is also often used to justify text
+    # alignment.  So sequence of multiple IDEOGRAPHIC SPACEs won't be
+    # broken.
     propmap.update( {
         0x3000: (2, 'IDSP'), # IDEOGRAPHIC SPACE
         } )
@@ -492,10 +516,15 @@ def customize(propmap):
         # Various Signs - ID.
         0x19DE: (1, 'ID'), # NEW TAI LUE SIGN LAE
         0x19DF: (1, 'ID'), # NEW TAI LUE SIGN LAEV
-    } )
+        } )
 
 
     ## Other customizations.
+
+    # FORM FEED may be either breakable or unbreakable (tailorable).
+    propmap.update( {
+        0x000C: (1, 'BKFF'), # <control> form feed
+        } )
 
     # Characters in BMP Private Use Area are assumed as wide.  Since they
     # are often used, by some standardize organizations and font

@@ -4,9 +4,16 @@
 """
 Rules.py - Definitions of UAX#14 Line Breaking Rules.
 
-Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
-redistributed under GNU General Public License version 2 (or later
-version you prefer).
+Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+
+This file is part of the Linefold Package.  This program is free
+software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.  This program is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+COPYING file for more details.
 
 $Id$
 
@@ -20,6 +27,7 @@ ORDINAL_CLASSES = [
     # Korean syllables and combining jamos.
     'H2', 'H3', 'JL', 'JV', 'JT',
     # Extended classes.
+    'IDSP',
     'SPOP', 'CLH', 'CLSP', 'CLHSP',
     ]
 # Classes for explicit break. THESE SHOULDN'T BE MODIFIED.
@@ -110,11 +118,15 @@ LINE_BREAKING_RULES = [
       'desc': "Do not break within ‘——’, even with intervening spaces.", },
     (['B2'], prohSP, ['B2']),
 
+    { 'name': "18excIDSP",
+      'desc': "Do not break within sequence of ideographic spaces.", },
+    (['IDSP'], prohib, ['IDSP']),                   # extended
+
     { 'name': "18",
       'desc': "Break after spaces.", },
     (['SP'], allows, ALL),
 
-    { 'name': "18ext",
+    { 'name': "18extCLSP",
       'desc': """...and also break after closing punctuations with
       virtual glue.""", },
     (['CLSP', 'CLHSP'], allows, ALL),               # extended
@@ -140,19 +152,24 @@ LINE_BREAKING_RULES = [
       'desc': """Do not break between two ellipses, or between letters
       or numbers and ellipsis.""", },
     (['AL', 'ID', 'IN', 'NU'], prohib, ['IN']),
+    { 'name': "22ext", 'desc': "ditto.", },
+    (['IDSP'], prohib, ['IN']),                     # extended
 
     { 'name': "23",
       'desc': "Do not break within ‘a9’, ‘3a’, or ‘H%’.", },
     (['ID'], prohib, ['PO']),
     (['AL'], prohib, ['NU']),
     (['NU'], prohib, ['AL']),
-
+    { 'name': "23ext", 'desc': "ditto.", },
+    (['IDSP'], prohib, ['PO']),                     # extended
 
     { 'name': "24",
       'desc': "Do not break between prefix and letters or ideographs.", },
     (['PR'], prohib, ['ID']),
     (['PR'], prohib, ['AL']),
     (['PO'], prohib, ['AL']),
+    { 'name': "24ext", 'desc': "ditto.", },
+    (['PR'], prohib, ['IDSP']),                     # extended
 
     { 'name': "25",
       'desc': """Do not break between the following pairs of classes
@@ -163,7 +180,7 @@ LINE_BREAKING_RULES = [
     { 'name': "25ext", 'desc': 'ditto.', },
     (['CLH'], prohib, ['PO', 'PR']),                # extended
 
-    { 'name': "25exc",
+    { 'name': "25excSPOP",
       'desc': """...but allow break before opening punctuations with
       virtual glue.""", },
     (['PO', 'PR'], allows, ['SPOP']),               # extended
@@ -197,8 +214,12 @@ LINE_BREAKING_RULES = [
     { 'name': "30ext", 'desc': 'ditto.', },
     (['CLH'], prohib, ['AL', 'NU']),                # extended
 
+    { 'name': "31excIDSP",
+      'desc': """Do not break between exclamation/question marks and
+      ideographic space.""", },
+    (['EX'], prohib, ['IDSP']),                     # extended
+
     { 'name': "31",
       'desc': "Break everywhere else.", },
     (ALL, allows, ALL),
 ]
-

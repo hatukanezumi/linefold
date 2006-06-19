@@ -1,0 +1,11 @@
+TODO List
+*********
+
+- Documentation.
+
+- Support UTF-8 based iconv (Solaris for CJK).
+
+- Callback-oriented API to handle partial/additional inputs.
+
+
+$$

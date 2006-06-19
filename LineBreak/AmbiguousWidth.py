@@ -5,9 +5,16 @@
 AmbiguousWidth.py - Ambiguous widths for East Asian multibyte
 character sets.
 
-Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
-redistributed under GNU General Public License version 2 (or later
-version you prefer).
+Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+
+This file is part of the Linefold Package.  This software is free
+software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.  This software is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+COPYING file for more details.
 
 $id$
 """
@@ -441,24 +448,13 @@ def getmap(propmap):
                         lbc = 'AL'
             legacy_maps[r][u] = (width, lbc)
 
-    # In East Asian box-filled folding context, especially on narrow or
-    # fixed-width faces, ellipsises occationally allow Break Before but
-    # are inseparable between themselves.  As a workaround, assign them to
-    # B2.  Vertical double-width kana repeat marks will be handled by same
-    # manner.
-    # Note:
-    # - If it is preferred that breaks within multi-width ellipsises are
-    #   allowed, change classes to 'ID'.
-    # - If alphabetic behavior is preferred, change the classes to 'IN'.
+    # Paired vertical kana repeat marks sohuldn't be separable. As a
+    # workaround, assign them to B2.
     for r in legacy_maps.keys():
         legacy_maps[r].update( {
-            0x2026: (2, 'B2'), # TWO DOT LEADER
-            0x2027: (2, 'B2'), # HORIZONTAL ELLIPSIS
             0x3033: (2, 'B2'), # VERTICAL KANA REPEAT MARK UPPER HALF
             0x3034: (2, 'B2'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
             0x3035: (2, 'B2'), # VERTICAL KANA REPEAT MARK LOWER HALF
-            0xFE30: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
-            0xFE19: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL HORIZONTAL ELLIPSIS
             } )
 
     return legacy_maps

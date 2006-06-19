@@ -2,9 +2,16 @@
  * An implementation of line breaking algorithm described in
  * Unicode Standard Annex #14 (UAX#14).
  *
- * Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
- * redistributed under GNU General Public License version 2 (or later
- * version you prefer).
+ * Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+ *
+ * This file is part of the Linefold Package.  This program is free
+ * software; you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option)
+ * any later version.  This program is distributed in the hope that
+ * it will be useful, but WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the COPYING file for more details.
  * 
  * $Id$
  */
@@ -12,8 +19,11 @@
 #ifndef LINEFOLD_H
 #define LINEFOLD_H
 
+#define LINEFOLD_API_VERSION 0x0100
+
 @INCLUDE_WCHAR_H@
-typedef @UNICODE_TYPE@ unicode_char;
+typedef @LINEFOLD_CHAR_TYPE@ linefold_char;
+typedef int linefold_width;
 typedef int linefold_class;
 typedef @LINEFOLD_OPTION_TYPE@ linefold_flags;
 
@@ -36,50 +46,56 @@ typedef enum {
 
 extern const linefold_action *linefold_lbpairs[];
 
-typedef void (*linefold_lbprop_funcptr)(unicode_char, int *, linefold_class *);
+typedef void (*linefold_lbprop_funcptr)(linefold_char,
+					linefold_width *, linefold_class *);
 
 /*
  * Data required by line breaking algorithm.
  */
 struct linefold_info
 {
-  int *widths;                          /* character widths */
-  linefold_class *lbclasses;            /* line breaking classes */
-  linefold_action *lbactions;           /* probable line breaking actions */
-  char *charset;                        /* charset context */
+  const linefold_width *widths;         /* character widths */
+  const linefold_class *lbclasses;      /* line breaking classes */
+  const linefold_action *lbactions;     /* probable line breaking actions */
+  const char *charset;                  /* charset context */
   size_t length;                        /* length of text */
   linefold_flags flags;                 /* options to tailor line breaking
 					   behavior */
+  size_t linp;                          /* Index of line in the paragraph. */
+  size_t lint;                          /* Index of line in the text. */
+  size_t pint;                          /* Index of paragraph in the text. */
 };
 
 /*
  * Public functions.
  */
 extern struct linefold_info
-*linefold_alloc(unicode_char *, size_t,
+*linefold_alloc(const linefold_char *, size_t,
 		linefold_lbprop_funcptr(*)(const char *, linefold_flags),
-		void (*)(unicode_char, int *, linefold_class *,
+		void (*)(linefold_char, linefold_width *, linefold_class *,
 			 linefold_flags),
 		const char *, linefold_flags);
 
 extern void linefold_free(struct linefold_info *);
 
 extern linefold_action
-linefold(struct linefold_info *, unicode_char *,
-	 int (*)(struct linefold_info *, unicode_char *,
-		 size_t, size_t, int, void *),
-	 void (*)(struct linefold_info *, unicode_char *,
+linefold(struct linefold_info *, linefold_char *,
+	 int (*)(const struct linefold_info *, const linefold_char *,
+		 size_t, size_t, size_t, void *),
+	 void (*)(const struct linefold_info *, const linefold_char *,
 		  size_t, size_t, linefold_action, void *),
-	 int, void *);
+	 size_t, void *);
 
 /* Built-in support functions */
 extern linefold_lbprop_funcptr
 linefold_find_lbprop_func(const char *, linefold_flags);
 extern void
-linefold_tailor_lbprop(unicode_char, int *, linefold_class *, linefold_flags);
+linefold_tailor_lbprop(linefold_char, linefold_width *, linefold_class *,
+		       linefold_flags);
 extern int
-linefold_check_length(struct linefold_info *, unicode_char *, size_t, size_t,
-		      int, void* voidarg);
+linefold_is_line_exceeded(const struct linefold_info *,
+			  const linefold_char *, size_t,
+			  size_t, size_t, void* voidarg);
 
 /*
  * Options to tailor line breaking behavior.
@@ -125,52 +141,62 @@ linefold_check_length(struct linefold_info *, unicode_char *, size_t, size_t,
 #define LINEFOLD_OPTION_NOBREAK_VT              (1<<7)
 
 /*
+ * Set this to treat U+000C form feed as CM, not BK.
+ */
+#define LINEFOLD_OPTION_NOBREAK_FF              (1<<8)
+
+/*
  * Set this to disable "burasage" (hunging punctuation in East Asian
  * text).
  */
-#define LINEFOLD_OPTION_NOHUNG_PUNCT            (1<<8)
+#define LINEFOLD_OPTION_NOHUNG_PUNCT            (1<<9)
 
 /*
  * By default, Wide OP/CL characters are treated as if they are a
  * Narrow character preceded/followed by SP.  Set this to disable
  * such feature.
  */
-#define LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<9)
+#define LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<10)
 
 /*
  * By default, IDEOGRAPHIC SPACE is treated as ID.  Set this to treat
  * it as SP.
  */
-#define LINEFOLD_OPTION_IDSP_IS_SP              (1<<10)
+#define LINEFOLD_OPTION_IDSP_IS_SP              (1<<11)
 
 /*
  * By default, small hiragana/katakana and KATAKANA-HIRAGANA PROLONGED
  * SIGN are NS.  Set this to treat these characters as ID. [JIS X 4051]
  */
-#define LINEFOLD_OPTION_RELAX_KANA_NS           (1<<11)
+#define LINEFOLD_OPTION_RELAX_KANA_NS           (1<<12)
 
 /*
  * Set this to treat spanish quotations INVERTED EXCLAMATION MARK and
  * INVERTED QUESTION MARK as AL, not OP. [UAX#14]
  */
-#define LINEFOLD_OPTION_OPAL_IS_AL              (1<<12)
+#define LINEFOLD_OPTION_OPAL_IS_AL              (1<<13)
+
+/*
+ * Set this to treat ellipsises as B2, not IN.
+ */
+#define LINEFOLD_OPTION_INB2_IS_B2              (1<<14)
 
 /*
  * Set this option to ommit Direct break oppotunities.
  * WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
  */
-#define LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<13)
+#define LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<15)
 
 /*
  * Set this option not to combine hangul combining jamos (JT, JV, JL)
  * when line lengths are determined.
  */
-#define LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<14)
+#define LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<16)
 
 /*
  * Set this to break SP+CM sequence. [UAX#14]
  */
-#define LINEFOLD_OPTION_BREAK_SPCM              (1<<15)
+#define LINEFOLD_OPTION_BREAK_SPCM              (1<<17)
 
 /* 
  * Set this option to force break unbreakable text longer than specified
@@ -178,7 +204,7 @@ linefold_check_length(struct linefold_info *, unicode_char *, size_t, size_t,
  * This violate line breaking rules then may cause break within words,
  * syllables, characters or on somewhere unpreferred.
  */
-#define LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<16)
+#define LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<18)
 
 #define LINEFOLD_OPTION_DEFAULT                 0
 

@@ -1,8 +1,15 @@
-linefold - Uicode Line Breaking Module.
+Linefold - Unicode Line Breaking Package.
 
-Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
-redistributed under GNU General Public License version 2 (or later
-version you prefer).
+Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+
+This file is part of the Linefold Package.  This program is free
+software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.  This program is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+COPYING file for more details.
 
 $Id$
 
@@ -24,71 +31,74 @@ linefold Library API
 
 2. Public functions
 
-struct linefold_info
-*linefold_alloc(unicode_char *text, size_t textlen,
-                         linefold_lbprop_funcptr
-                         (*find_lbprop_func)(const char *, linefold_flags),
-                         void (*tailor_lbprop)(unicode_char,
-                                               int *, linefold_class *,
-                                               linefold_flags),
-                         const char *chset, linefold_flags flags);
+struct linefold_info *
+linefold_alloc(const linefold_char *text, size_t textlen,
+	       linefold_lbprop_funcptr
+	       (*find_lbprop_func)(const char *, linefold_flags),
+	       void (*tailor_lbprop)(linefold_char,
+				     linefold_width *, linefold_class *,
+				     linefold_flags),
+	       const char *chset, linefold_flags flags);
 
-    Allocate line breaking informations for given unicode text.
+    This function allocates line breaking information for given unicode
+    text.
 
     Arguments:
         text:
-                Text to be broken.
+                Text to be broken.  This is array of Unicode ordinal
+                numbers.
         textlen:
                 Length of `text'.
         find_lbprop_func:
                 Function to get a function that get character properties
                 of unicode character.  If NULL is specified, built-in
-                function will be used.                
+                function will be used (see Customization section).
         tailor_lbprop:
                 Function to tailor character property.  If NULL is specified,
-                built-in function will be used.
+                built-in function will be used (see Customization section).
         chset:
-                Charset context.  This is fed to find_lbprop_func(), and
-                may referred through `lbinfo' argument fed to
+                Character set context.  This is fed to find_lbprop_func(),
+                and may referred through `lbinfo' argument fed to
                 is_line_exceeded() and writeout_cb().
         flags:
                 Bitwise options to customize behavior of line breaking
-                (see Option Flags).
+                (see Option Flags section).
 
-    Returns:
+    Return value:
         Pointer to allocated `struct linefold_info' data, line breaking
-        informations for `text'.  If `text' is NULL, length of `text' is zero,
-        or any error occur, NULL will be returned.
+        informations for `text'.  If `text' is NULL, length of `text' is
+        zero, or any error occur, NULL will be returned.
 
-void linefold_free(struct linefold_info *lbinfo);
+void
+linefold_free(struct linefold_info *lbinfo);
 
-    Free storage allocated by linefold_alloc().
+    This function frees storage allocated by linefold_alloc().
 
 linefold_action
-linefold(struct linefold_info *lbinfo, unicode_char *text,
-                  int (*is_line_exceeded)(struct linefold_info *,
-                                          unicode_char *,
-                                          ptrdiff_t, size_t, int),
-                  void (*writeout_cb)(struct linefold_info *,
-                                      unicode_char *,
-                                      ptrdiff_t, size_t, linefold_action),
-                  int maxlen, void *voidarg);
+linefold(struct linefold_info *lbinfo, linefold_char *text,
+	 int (*is_line_exceeded)(const struct linefold_info *,
+				 const linefold_char *,
+				 size_t, size_t, size_t, void *),
+	 void (*writeout_cb)(const struct linefold_info *,
+			     const linefold_char *,
+			     size_t, size_t, linefold_action, void *),
+	 size_t maxlen, void *voidarg);
 
-    Execute line breaking.
+    This function examines line breaking.
 
     Arguments:
         lbinfo:
-                Line breaking informations.
+                Line breaking information of `text'.
         text:
                 Array of unicode character to be broken.
         is_line_exceeded:
-                Function to determin whether length of a text fragment
+                Function to determine whether length of a text fragment
                 exceeds the limit specified by `maxlen'.  If NULL is
                 specified, built-in function will be used.
         writeout_cb:
                 Callback function to write out each broken lines (see
                 below).  If NULL is specified, linefold() will search
-                optimum line breaking points over text but never output
+                optimum line breaking points over `text' but never output
                 anything.
         maxlen:
                 Limit of line length.
@@ -97,7 +107,7 @@ linefold(struct linefold_info *lbinfo, unicode_char *text,
                 is_line_exceeded() and writeout_cb().  If you don't need
                 custom data, set this NULL.
 
-    Returns:
+    Return value:
         LINEFOLD_ACTION_NOMOD:
                 No breaks or only explicit break(s) have occured.
         LINEFOLD_ACTION_INDIRECT:
@@ -106,13 +116,15 @@ linefold(struct linefold_info *lbinfo, unicode_char *text,
                 Direct break(s) have occured, and possiblly Indirect
                 breaks also.
 
-    Callback function:
-        void writeout_cb(struct linefold_info *lbinfo,
-                         unicode_char *text, ptrdiff_t start, size_t size,
-                         linefold_action action, void *voidarg);
+    Callback functions:
+        void
+        writeout_cb(const struct linefold_info *lbinfo,
+		    const linefold_char *text,
+		    size_t start, size_t size, linefold_action action,
+		    void *voidarg);
 
-        Called by linefold() when breaking point is found then
-        something to output exists.
+        This function is called by linefold() when breaking point is found
+        then something to output exists.
 
         Arguments:
             lbinfo:
@@ -120,92 +132,113 @@ linefold(struct linefold_info *lbinfo, unicode_char *text,
             text:
                     Array of unicode character.
             start:
-                    Offset of text fragment to output on text.
+                    Offset of text fragment to output.
             size:
                     Length of text fragment to output.
             action:
                     Type of line breaking behavior:
-                    LINEFOLD_ACTION_EXPLICIT: Explicit break.
-                    LINEFOLD_ACTION_INDIRECT: Indirect break.
-                    LINEFOLD_ACTION_DIRECT:   Direct break.
-                    LINEFOLD_ACTION_EOT:      This line is the last line
-                                              of `text'.
+                    LINEFOLD_ACTION_EXPLICIT - Explicit break.
+                        A mandatory break character or sequence (e.g. LF,
+                        CRLF) caused line breaking.
+                    LINEFOLD_ACTION_INDIRECT - Indirect break.
+                        Breaking occur just after space(s) separating words.
+                    LINEFOLD_ACTION_DIRECT - Direct break.
+                        Breaking occur just after non-space character.
+                    LINEFOLD_ACTION_EOT - End of text.
+                        Text fragment is the last line of `text'.
             voidarg:
                     A pointer to custom data structure passed from
                     linefold().
 
-        Note: Terminating newlines and spaces in the text will not be trimmed
-          by calling function linefold() (see "Notes" below).  Also
-          note that the text may end without newline characters, or may end
-          with extra characters (e.g. EOF).
+        Note: Terminating newlines and spaces in the text fragments
+          will not be trimmed by calling function linefold() (for more
+          details see Notes section).  Also note that the text may end
+          without newline characters, or may end with extra characters
+          (e.g. EOF).
 
 
 Customization
 =============
 
-1. Customizing line breaking properties and rules
-
-To customize line breaking classes, character width informations
-or line breaking rules, read mklbproptab.py and relating files.
-
-Note: linebreaktab.c, linebreaktab.h and linebreakrule.html are 
-  generated by mklbproptab.py.  Don't edit these files manually.
-
-2. Customizing support functins
+1. Customizing support functins
 
 Following built-in functions may be customized to meet the needs of your
 application.
 
-Note: Don't modify built-in support functions contained in
-  linefold.c.  Otherwise, write new functions then
-  feed them as arguments of linefold_alloc() and/or
-  linefold().
+Note: Do not modify built-in support functions contained in linefold.c.
+  Otherwise, write new functions then feed them as arguments of
+  linefold_alloc() and/or linefold().
 
-* Argument 'flags' is bitwise options to customize behavior of these
-  functions.  For more details see Option Flags.
+Argument 'flags' is bitwise option to customize behavior of these
+functions (see Option Flags section).
 
-linefold_lbprop_funcptr linefold_find_lbprop_func(const char *chset,
-                                                  linefold_flags flags);
 
-        Find a function to get character property suitable for
-        specified charset `chset'.  If `chset' is NULL, length of `chset'
-        is zero or appropriate function has not been found, a function
-        linefold_find_lbprop_generic(), supporting generic context, should
-        be returned. 
+linefold_lbprop_funcptr
+linefold_find_lbprop_func(const char *chset, linefold_flags flags);
 
-void linefold_tailor_lbprop(unicode_char c,
-                            int *widthptr, linefold_class *lbcptr,
-                            linefold_flags flags);
+        This function find a function to get character property suitable
+        for specified character set context `chset'.  If `chset' is NULL,
+        length of `chset' is zero or appropriate function has not been
+        found, a function linefold_find_lbprop_generic(), supporting
+        generic context, should be returned. 
 
-        Sets customized width and line breaking class information of
-        character c.
-        `widthptr' and `lbcptr' are pointer to values of width and line
-        breaking class.
+        Return value of this function is a pointer to function with
+        following prototype:
 
-int linefold_check_length(struct linefold_info *lbinfo,
-                                   unicode_char *text,
-                                   ptrdiff_t start, size_t len, int maxlen,
-                                   void *voidarg);
+	    void
+            func(linefold_char c,
+		 linefold_width * widthptr, linefold_class * lbcptr);
 
-        Returns boolean value indicating whether width (length) of text
-        exceed `maxlen' or not.  `text' is buffer containing text fragment
-        to check.  `start' and `textlen' are offset on `text' and length of
-        text fragment.
+	Arguments `widthptr' and `lbcptr' are pointers to variable to
+        hold width and line breaking class of character c, respectively.
+
+void
+linefold_tailor_lbprop(linefold_char c,
+		       linefold_width *widthptr, linefold_class *lbcptr,
+		       linefold_flags flags);
+
+        This function sets customized width and line breaking class
+        information of character c.
+        `widthptr' and `lbcptr' are pointer to variables holding width
+        and line breaking class.
+
+	Note: When this function is called, lbcptr can hold undocumented
+          internal class value.
+
+int
+linefold_is_line_exceeded(const struct linefold_info *lbinfo,
+			  const linefold_char *text,
+			  size_t start, size_t len, size_t maxlen,
+			  void *voidarg);
+
+        This function returns boolean value indicating whether width
+        (length) of text fragment exceed `maxlen' or not.  `text' is
+        buffer containing text fragment to check.  `start' and `textlen'
+        are offset on `text' and length of text fragment.
+
+2. Customizing line breaking properties and rules
+
+To customize line breaking classes, character width informations or line
+breaking rules built in this software, read mklbproptab.py and relating
+Python sources.
+
+Note: linebreaktab.c, linebreaktab.h and linebreakrule.html are 
+  generated by mklbproptab.py.  Don't edit these files manually.
 
 
 Option Flags
 ============
 
-LINEFOLD_OPTION_GENERIC_WIDTH           1
+LINEFOLD_OPTION_GENERIC_WIDTH
 
   Function: linefold_find_lbprop_func()
 
   Resolve character width within generic (Unicode) context, even if
   character set context was specified.
 
-LINEFOLD_OPTION_NARROW_LATIN            (1<<1)
-LINEFOLD_OPTION_NARROW_GREEK            (1<<2)
-LINEFOLD_OPTION_NARROW_CYRILLIC         (1<<3)
+LINEFOLD_OPTION_NARROW_LATIN
+LINEFOLD_OPTION_NARROW_GREEK
+LINEFOLD_OPTION_NARROW_CYRILLIC
 
   Function: linefold_tailor_lbprop()
 
@@ -215,40 +248,46 @@ LINEFOLD_OPTION_NARROW_CYRILLIC         (1<<3)
   multibyte context.  Set these options to treat such letters always
   Narrow.
 
-LINEFOLD_OPTION_BREAK_HY                (1<<4)
+LINEFOLD_OPTION_BREAK_HY
 
   Function: linefold_tailor_lbprop()
 
   Set this to allow break after HY (U+002D HYPHEN-MINUS), before AL.
   By default, breaking directly before AL is not allowed.
 
-LINEFOLD_OPTION_BREAK_SOFT_HYPHEN       (1<<5)
+LINEFOLD_OPTION_BREAK_SOFT_HYPHEN
 
   Function: linefold_tailor_lbprop()
 
   Set this to allow break after U+00AD SOFT HYPHEN.  By default, breaking
   directly after soft hyphen is not allowed.
 
-LINEFOLD_OPTION_NOBREAK_NL              (1<<6)
+LINEFOLD_OPTION_NOBREAK_FF
+
+  Function: linefold_tailor_lbprop()
+
+  Set this to treat U+000C form feed as CM, not BK.
+
+LINEFOLD_OPTION_NOBREAK_NL
 
   Function: linefold_tailor_lbprop()
 
   Set this to treat U+0085 NEL as CM, not BK. [UAX#14]
 
-LINEFOLD_OPTION_NOBREAK_VT              (1<<7)
+LINEFOLD_OPTION_NOBREAK_VT
 
   Function: linefold_tailor_lbprop()
 
   Set this to treat U+000B vertical tab as CM, not BK. [UAX#14]
 
-LINEFOLD_OPTION_NOHUNG_PUNCT            (1<<8)
+LINEFOLD_OPTION_NOHUNG_PUNCT
 
   Function: linefold_tailor_lbprop()
 
   Set this to disable "burasage" (hunging punctuation in East Asian
   text).
 
-LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<9)
+LINEFOLD_OPTION_NOGLUE_PUNCT
 
   Function: linefold_tailor_lbprop()
 
@@ -256,48 +295,48 @@ LINEFOLD_OPTION_NOGLUE_PUNCT            (1<<9)
   Narrow character preceded/followed by SP.  Set this to disable
   such feature.
 
-LINEFOLD_OPTION_IDSP_IS_SP              (1<<10)
+LINEFOLD_OPTION_IDSP_IS_SP
 
   Function: linefold_tailor_lbprop()
 
   By default, IDEOGRAPHIC SPACE is treated as ID.  Set this to treat
   it as SP.
 
-LINEFOLD_OPTION_RELAX_KANA_NS           (1<<11)
+LINEFOLD_OPTION_RELAX_KANA_NS
 
   Function: linefold_tailor_lbprop()
 
   By default, small hiragana/katakana and KATAKANA-HIRAGANA PROLONGED
   SIGN are NS.  Set this to treat these characters as ID. [JIS X 4051]
 
-LINEFOLD_OPTION_OPAL_IS_AL              (1<<12)
+LINEFOLD_OPTION_OPAL_IS_AL
 
   Function: linefold_tailor_lbprop()
 
   Set this to treat spanish quotations INVERTED EXCLAMATION MARK and
   INVERTED QUESTION MARK as AL, not OP. [UAX#14]
 
-LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<13)
+LINEFOLD_OPTION_NOBREAK_DIRECT
 
   Function: linefold()
 
   Set this option to ommit Direct break oppotunities.
   WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
 
-LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<14)
+LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO
 
-  Function: linefold_check_length()
+  Function: linefold_is_line_exceeded()
 
   Set this option not to combine hangul combining jamos (JT, JV, JL)
   when line lengths are determined.
 
-LINEFOLD_OPTION_BREAK_SPCM              (1<<15)
+LINEFOLD_OPTION_BREAK_SPCM
 
   Function: linefold()
 
   Set this to break SP+CM sequence. [UAX#14]
 
-LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<16)
+LINEFOLD_OPTION_FORCE_LINEWIDTH
 
   Function: linefold()
 
@@ -326,7 +365,7 @@ following characters or sequences:
 
 2. Long lines
 
-Sometimes lines longer than specified limit appear in output:
+Sometimes lines longer than specified limit can appear in output:
 
 a) Sequence of SPACEs terminating Indirect break or sequences of newline
   (see above) terminating Explicit break won't be trimmed.  Line
@@ -338,8 +377,8 @@ b) Long character sequences in which no line break oppotunities are found,
   If you exactly shouldn't allow such pathological cases, Set
   LINEFOLD_OPTION_FORCE_LINEWIDTH on.
 
-c) Tab stop processing is not supported by this module.  Holizontal tab
-  will be always treated as a character width 1 column.
+c) Tab stop processing is not supported by this module.  Horizontal tab
+  will be always treated as a character with 1 column width.
 
 d) Hunging punctuation ("burasage") in East Asian text.  This will
   exceed up to one character width of limit.  For more detail read
@@ -347,7 +386,7 @@ d) Hunging punctuation ("burasage") in East Asian text.  This will
   and ``CLHSP''.  To disable hunging punctuation, set
   LINEFOLD_OPTION_NO_HUNGING_PUNCT on.
 
-e) Similar case; Wide closing punctuations containing virtual glue.  They
+e) Similar case; wide closing punctuations containing virtual glue.  They
   may exceed one column width of limit.  For more detail read
   LineBreak/CharacterProperties.py, section about custom classes ``CLSP''
   and ``CLHSP''.  To disable virtual glue of wide closing punctuations, Set

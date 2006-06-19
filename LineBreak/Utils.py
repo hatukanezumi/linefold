@@ -4,9 +4,16 @@
 """
 Utils.py - Utility Functions.
 
-Copyright © 2006 by Hatuka*nezumi - IKEDA Soji <hatuka(at)nezumi.nu>,
-redistributed under GNU General Public License version 2 (or later
-version you prefer).
+Copyright (C) 2006 by Hatuka*nezumi - IKEDA Soji.  All rights reserved.
+
+This file is part of the Linefold Package.  This program is free
+software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.  This program is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+COPYING file for more details.
 
 $Id$
 """
@@ -39,7 +46,7 @@ def readunidata(fp):
             ret[c] = val
     return ret
 
-def printpropmap(fp, propmap, classes):
+def printpropmap(fp, propmap, class_idx):
     num4 = num2 = num1 = None
     num = 0
 
@@ -60,31 +67,29 @@ def printpropmap(fp, propmap, classes):
         elif e[0]+1 == k and e[1] == v:
             e = (k, v)
             continue
-        print >>fp, '    {0x%04X, 0x%04X, %d, LINEFOLD_CLASS_%s},' % \
-              (s[0], e[0], s[1][0], s[1][1])
+        print >>fp, '    {0x%04X, 0x%04X, %d, %2d /* %s */},' % \
+              (s[0], e[0], s[1][0], class_idx[s[1][1]], s[1][1])
         if e[0] <= 0xFF and k >= 0x100:
-            print >>fp, '#if SIZEOF_UNICODE_CHAR > 1'
+            print >>fp, '#if SIZEOF_LINEFOLD_CHAR > 1'
         elif e[0] <= 0xFFFF and k >= 0x10000:
-            print >>fp, '#if SIZEOF_UNICODE_CHAR > 2'
-        if not s[1][1] in classes: classes.append(s[1][1])
+            print >>fp, '#if SIZEOF_LINEFOLD_CHAR > 2'
         s = (k, v)
         e = (k, v)
         num += 1
     if s is not None:
-        print >>fp, '    {0x%04X, 0x%04X, %d, LINEFOLD_CLASS_%s},' % \
-              (s[0], e[0], s[1][0], s[1][1])
-        if not s[1][1] in classes: classes.append(s[1][1])
+        print >>fp, '    {0x%04X, 0x%04X, %d, %2d /* %s */},' % \
+              (s[0], e[0], s[1][0], class_idx[s[1][1]], s[1][1])
         num += 1
     if num4 is None:
         num4 = num
     if num2 is None:
         num2 = num
     else:
-        print >>fp, '#endif /* SIZEOF_UNICODE_CHAR > 2 */'
+        print >>fp, '#endif /* SIZEOF_LINEFOLD_CHAR > 2 */'
     if num1 is None:
         num1 = num
     else:
-        print >>fp, '#endif /* SIZEOF_UNICODE_CHAR > 1 */'
+        print >>fp, '#endif /* SIZEOF_LINEFOLD_CHAR > 1 */'
     return num4, num2, num1
 
 def generate_lbclass_pair(classes, lbrules):
