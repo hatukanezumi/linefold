@@ -197,6 +197,15 @@ for c in EXPLICIT_BREAK_CLASSES:
     idx += 1
 print >>fp, ""
 
+for c in [c for c in allclasses
+          if not c in ORDINAL_CLASSES+EXPLICIT_BREAK_CLASSES+['SP']]:
+    idx += 1
+print >>fp, """\
+/* User defined class. */
+
+const linefold_class LINEFOLD_CLASS_USERDEFINED = %2d;
+""" % idx
+
 print >>fp, """\
 /*
  * Character properties related on line breaking behavior.
@@ -400,6 +409,12 @@ for c in [c for c in allclasses
     print >>fp, "#define LINEFOLD_CLASS_%s %d" % (c, idx)
     idx += 1
 print >>fp, ""
+
+print >>fp, """\
+/* User defined class. */
+
+extern const linefold_class LINEFOLD_CLASS_USERDEFINED;
+"""
 
 print >>fp, """\
 extern void linefold_getprop_generic(linefold_char,

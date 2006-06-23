@@ -61,6 +61,10 @@ const linefold_class LINEFOLD_CLASS_CR = 33;
 const linefold_class LINEFOLD_CLASS_LF = 34;
 const linefold_class LINEFOLD_CLASS_NL = 35;
 
+/* User defined class. */
+
+const linefold_class LINEFOLD_CLASS_USERDEFINED = 42;
+
 /*
  * Character properties related on line breaking behavior.
  */
@@ -116,7 +120,7 @@ static lbprop lbprop_tab[] = {
     {0x0085, 0x0085, 1, 35 /* NL */},
     {0x0086, 0x009F, 1, 19 /* CM */},
     {0x00A0, 0x00A0, 1,  3 /* GL */},
-    {0x00A1, 0x00A1, 1, 40 /* OPAL */},
+    {0x00A1, 0x00A1, 1, 41 /* OPAL */},
     {0x00A2, 0x00A2, 1,  9 /* PO */},
     {0x00A3, 0x00A5, 1,  8 /* PR */},
     {0x00A6, 0x00AA, 1, 11 /* AL */},
@@ -132,7 +136,7 @@ static lbprop lbprop_tab[] = {
     {0x00B6, 0x00BA, 1, 11 /* AL */},
     {0x00BB, 0x00BB, 1,  2 /* QU */},
     {0x00BC, 0x00BE, 1, 11 /* AL */},
-    {0x00BF, 0x00BF, 1, 40 /* OPAL */},
+    {0x00BF, 0x00BF, 1, 41 /* OPAL */},
     {0x00C0, 0x00FF, 1, 11 /* AL */},
 #if SIZEOF_LINEFOLD_CHAR > 1
     {0x0100, 0x0241, 1, 11 /* AL */},
@@ -623,12 +627,12 @@ static lbprop lbprop_tab[] = {
     {0x2038, 0x2038, 1, 11 /* AL */},
     {0x2039, 0x203A, 1,  2 /* QU */},
     {0x203B, 0x203B, 1, 11 /* AL */},
-    {0x203C, 0x203D, 1,  5 /* EX */},
+    {0x203C, 0x203D, 1, 39 /* NSEX */},
     {0x203E, 0x2043, 1, 11 /* AL */},
     {0x2044, 0x2044, 1,  7 /* IS */},
     {0x2045, 0x2045, 1,  0 /* OP */},
     {0x2046, 0x2046, 1,  1 /* CL */},
-    {0x2047, 0x2049, 1,  5 /* EX */},
+    {0x2047, 0x2049, 1, 39 /* NSEX */},
     {0x204A, 0x2055, 1, 11 /* AL */},
     {0x2056, 0x2056, 1, 15 /* BA */},
     {0x2057, 0x2057, 1, 11 /* AL */},
@@ -802,67 +806,67 @@ static lbprop lbprop_tab[] = {
     {0x3020, 0x3029, 2, 12 /* ID */},
     {0x302A, 0x302F, 0, 19 /* CM */},
     {0x3030, 0x3032, 2, 12 /* ID */},
-    {0x3033, 0x3035, 2, 13 /* IN */},
+    {0x3033, 0x3035, 2, 17 /* B2 */},
     {0x3036, 0x303A, 2, 12 /* ID */},
     {0x303B, 0x303C, 2,  4 /* NS */},
     {0x303D, 0x303E, 2, 12 /* ID */},
     {0x303F, 0x303F, 1, 12 /* ID */},
-    {0x3041, 0x3041, 2, 39 /* NSK */},
+    {0x3041, 0x3041, 2, 40 /* NSK */},
     {0x3042, 0x3042, 2, 12 /* ID */},
-    {0x3043, 0x3043, 2, 39 /* NSK */},
+    {0x3043, 0x3043, 2, 40 /* NSK */},
     {0x3044, 0x3044, 2, 12 /* ID */},
-    {0x3045, 0x3045, 2, 39 /* NSK */},
+    {0x3045, 0x3045, 2, 40 /* NSK */},
     {0x3046, 0x3046, 2, 12 /* ID */},
-    {0x3047, 0x3047, 2, 39 /* NSK */},
+    {0x3047, 0x3047, 2, 40 /* NSK */},
     {0x3048, 0x3048, 2, 12 /* ID */},
-    {0x3049, 0x3049, 2, 39 /* NSK */},
+    {0x3049, 0x3049, 2, 40 /* NSK */},
     {0x304A, 0x3062, 2, 12 /* ID */},
-    {0x3063, 0x3063, 2, 39 /* NSK */},
+    {0x3063, 0x3063, 2, 40 /* NSK */},
     {0x3064, 0x3082, 2, 12 /* ID */},
-    {0x3083, 0x3083, 2, 39 /* NSK */},
+    {0x3083, 0x3083, 2, 40 /* NSK */},
     {0x3084, 0x3084, 2, 12 /* ID */},
-    {0x3085, 0x3085, 2, 39 /* NSK */},
+    {0x3085, 0x3085, 2, 40 /* NSK */},
     {0x3086, 0x3086, 2, 12 /* ID */},
-    {0x3087, 0x3087, 2, 39 /* NSK */},
+    {0x3087, 0x3087, 2, 40 /* NSK */},
     {0x3088, 0x308D, 2, 12 /* ID */},
-    {0x308E, 0x308E, 2, 39 /* NSK */},
+    {0x308E, 0x308E, 2, 40 /* NSK */},
     {0x308F, 0x3094, 2, 12 /* ID */},
-    {0x3095, 0x3096, 2, 39 /* NSK */},
+    {0x3095, 0x3096, 2, 40 /* NSK */},
     {0x3099, 0x309A, 0, 19 /* CM */},
     {0x309B, 0x309E, 2,  4 /* NS */},
     {0x309F, 0x309F, 2, 12 /* ID */},
     {0x30A0, 0x30A0, 2,  4 /* NS */},
-    {0x30A1, 0x30A1, 2, 39 /* NSK */},
+    {0x30A1, 0x30A1, 2, 40 /* NSK */},
     {0x30A2, 0x30A2, 2, 12 /* ID */},
-    {0x30A3, 0x30A3, 2, 39 /* NSK */},
+    {0x30A3, 0x30A3, 2, 40 /* NSK */},
     {0x30A4, 0x30A4, 2, 12 /* ID */},
-    {0x30A5, 0x30A5, 2, 39 /* NSK */},
+    {0x30A5, 0x30A5, 2, 40 /* NSK */},
     {0x30A6, 0x30A6, 2, 12 /* ID */},
-    {0x30A7, 0x30A7, 2, 39 /* NSK */},
+    {0x30A7, 0x30A7, 2, 40 /* NSK */},
     {0x30A8, 0x30A8, 2, 12 /* ID */},
-    {0x30A9, 0x30A9, 2, 39 /* NSK */},
+    {0x30A9, 0x30A9, 2, 40 /* NSK */},
     {0x30AA, 0x30C2, 2, 12 /* ID */},
-    {0x30C3, 0x30C3, 2, 39 /* NSK */},
+    {0x30C3, 0x30C3, 2, 40 /* NSK */},
     {0x30C4, 0x30E2, 2, 12 /* ID */},
-    {0x30E3, 0x30E3, 2, 39 /* NSK */},
+    {0x30E3, 0x30E3, 2, 40 /* NSK */},
     {0x30E4, 0x30E4, 2, 12 /* ID */},
-    {0x30E5, 0x30E5, 2, 39 /* NSK */},
+    {0x30E5, 0x30E5, 2, 40 /* NSK */},
     {0x30E6, 0x30E6, 2, 12 /* ID */},
-    {0x30E7, 0x30E7, 2, 39 /* NSK */},
+    {0x30E7, 0x30E7, 2, 40 /* NSK */},
     {0x30E8, 0x30ED, 2, 12 /* ID */},
-    {0x30EE, 0x30EE, 2, 39 /* NSK */},
+    {0x30EE, 0x30EE, 2, 40 /* NSK */},
     {0x30EF, 0x30F4, 2, 12 /* ID */},
-    {0x30F5, 0x30F6, 2, 39 /* NSK */},
+    {0x30F5, 0x30F6, 2, 40 /* NSK */},
     {0x30F7, 0x30FA, 2, 12 /* ID */},
     {0x30FB, 0x30FB, 2,  4 /* NS */},
-    {0x30FC, 0x30FC, 2, 39 /* NSK */},
+    {0x30FC, 0x30FC, 2, 40 /* NSK */},
     {0x30FD, 0x30FE, 2,  4 /* NS */},
     {0x30FF, 0x30FF, 2, 12 /* ID */},
     {0x3105, 0x312C, 2, 12 /* ID */},
     {0x3131, 0x318E, 2, 12 /* ID */},
     {0x3190, 0x31B7, 2, 12 /* ID */},
     {0x31C0, 0x31CF, 2, 12 /* ID */},
-    {0x31F0, 0x31FF, 2, 39 /* NSK */},
+    {0x31F0, 0x31FF, 2, 40 /* NSK */},
     {0x3200, 0x321E, 2, 12 /* ID */},
     {0x3220, 0x3243, 2, 12 /* ID */},
     {0x3250, 0x32FE, 2, 12 /* ID */},
@@ -1994,15 +1998,14 @@ static lbprop lbprop_C_tab[] = {
     {0x2774, 0x2774, 2,  0 /* OP */},
     {0x2775, 0x2775, 2,  1 /* CL */},
     {0x2776, 0x27BF, 2, 12 /* ID */},
-    {0x3033, 0x3035, 2, 17 /* B2 */},
 #endif /* SIZEOF_LINEFOLD_CHAR > 1 */
     {0, 0, 0, 0}
 };
 
 #if SIZEOF_LINEFOLD_CHAR > 2
-static size_t lbprop_C_len = 94;
+static size_t lbprop_C_len = 93;
 #elif SIZEOF_LINEFOLD_CHAR > 1
-static size_t lbprop_C_len = 94;
+static size_t lbprop_C_len = 93;
 #else
 static size_t lbprop_C_len = 6;
 #endif /* SIZEOF_LINEFOLD_CHAR */
@@ -2102,15 +2105,14 @@ static lbprop lbprop_G_tab[] = {
     {0x2774, 0x2774, 2,  0 /* OP */},
     {0x2775, 0x2775, 2,  1 /* CL */},
     {0x2776, 0x27BF, 2, 12 /* ID */},
-    {0x3033, 0x3035, 2, 17 /* B2 */},
 #endif /* SIZEOF_LINEFOLD_CHAR > 1 */
     {0, 0, 0, 0}
 };
 
 #if SIZEOF_LINEFOLD_CHAR > 2
-static size_t lbprop_G_len = 94;
+static size_t lbprop_G_len = 93;
 #elif SIZEOF_LINEFOLD_CHAR > 1
-static size_t lbprop_G_len = 94;
+static size_t lbprop_G_len = 93;
 #else
 static size_t lbprop_G_len = 7;
 #endif /* SIZEOF_LINEFOLD_CHAR */
@@ -2223,22 +2225,21 @@ static lbprop lbprop_J_tab[] = {
     {0x2774, 0x2774, 2,  0 /* OP */},
     {0x2775, 0x2775, 2,  1 /* CL */},
     {0x2776, 0x27BF, 2, 12 /* ID */},
-    {0x3033, 0x3035, 2, 17 /* B2 */},
     {0xFFFD, 0xFFFD, 2, 12 /* ID */},
 #endif /* SIZEOF_LINEFOLD_CHAR > 1 */
     {0, 0, 0, 0}
 };
 
 #if SIZEOF_LINEFOLD_CHAR > 2
-static size_t lbprop_J_len = 108;
+static size_t lbprop_J_len = 107;
 #elif SIZEOF_LINEFOLD_CHAR > 1
-static size_t lbprop_J_len = 108;
+static size_t lbprop_J_len = 107;
 #else
 static size_t lbprop_J_len = 7;
 #endif /* SIZEOF_LINEFOLD_CHAR */
 
 static lbprop lbprop_K_tab[] = {
-    {0x00A1, 0x00A1, 2, 40 /* OPAL */},
+    {0x00A1, 0x00A1, 2, 41 /* OPAL */},
     {0x00A4, 0x00A4, 2,  8 /* PR */},
     {0x00A7, 0x00A8, 2, 11 /* AL */},
     {0x00AA, 0x00AA, 2, 11 /* AL */},
@@ -2250,7 +2251,7 @@ static lbprop lbprop_K_tab[] = {
     {0x00B4, 0x00B4, 2, 16 /* BB */},
     {0x00B6, 0x00BA, 2, 11 /* AL */},
     {0x00BC, 0x00BE, 2, 11 /* AL */},
-    {0x00BF, 0x00BF, 2, 40 /* OPAL */},
+    {0x00BF, 0x00BF, 2, 41 /* OPAL */},
     {0x00C6, 0x00C6, 2, 11 /* AL */},
     {0x00D0, 0x00D0, 2, 11 /* AL */},
     {0x00D7, 0x00D8, 2, 11 /* AL */},
@@ -2364,16 +2365,15 @@ static lbprop lbprop_K_tab[] = {
     {0x2774, 0x2774, 2,  0 /* OP */},
     {0x2775, 0x2775, 2,  1 /* CL */},
     {0x2776, 0x27BF, 2, 12 /* ID */},
-    {0x3033, 0x3035, 2, 17 /* B2 */},
     {0xFFFC, 0xFFFC, 2, 12 /* ID */},
 #endif /* SIZEOF_LINEFOLD_CHAR > 1 */
     {0, 0, 0, 0}
 };
 
 #if SIZEOF_LINEFOLD_CHAR > 2
-static size_t lbprop_K_len = 127;
+static size_t lbprop_K_len = 126;
 #elif SIZEOF_LINEFOLD_CHAR > 1
-static size_t lbprop_K_len = 127;
+static size_t lbprop_K_len = 126;
 #else
 static size_t lbprop_K_len = 21;
 #endif /* SIZEOF_LINEFOLD_CHAR */

@@ -127,10 +127,10 @@ struct option_table options[] = {
     "How to handle unconvertible characters.  If ignore is\n"
     "specified, skip illegal characters and continue conversion.\n"
     "If strict is specified, exit with non-zero status.  If replace\n"
-    "is specified, illegal characters in input are replaced to\n"
+    "is specified, illegal characters in input are replaced with\n"
     "U+FFFD REPLACEMENT CHARACTER and unconvertible characters in\n"
-    "output are replaced to substitution characters trying to\n"
-    "preserve character widths.  Default is replace."
+    "output are replaced with substitution characters trying to\n"
+    "preserve character width.  Default is replace."
   },
   {
     '-', "direct break", "yes|no",
@@ -162,6 +162,11 @@ struct option_table options[] = {
     'h', "help", NULL,
     0, 0,&option_help,0,0,0,0,
     "Print usage and exit."
+  },
+  {
+    '-', "hunging IDEOGRAPHIC SPACE", "yes|no",
+    1, LINEFOLD_OPTION_NOHUNG_IDSP,0,0,0,0,0,
+    "Enable hunging IDEOGRAPHIC SPACE."
   },
   {
     '-', "hunging punctuation", "yes|no",

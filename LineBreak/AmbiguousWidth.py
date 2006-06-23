@@ -447,14 +447,4 @@ def getmap(propmap):
                     else:
                         lbc = 'AL'
             legacy_maps[r][u] = (width, lbc)
-
-    # Paired vertical kana repeat marks sohuldn't be separable. As a
-    # workaround, assign them to B2.
-    for r in legacy_maps.keys():
-        legacy_maps[r].update( {
-            0x3033: (2, 'B2'), # VERTICAL KANA REPEAT MARK UPPER HALF
-            0x3034: (2, 'B2'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
-            0x3035: (2, 'B2'), # VERTICAL KANA REPEAT MARK LOWER HALF
-            } )
-
     return legacy_maps

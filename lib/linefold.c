@@ -126,9 +126,9 @@ void linefold_free(struct linefold_info *lbinfo)
 /* Do line breaking */
 linefold_action
 linefold(struct linefold_info *lbinfo, linefold_char *text,
-	 int (*is_line_exceeded)(const struct linefold_info *,
-				 const linefold_char *,
-				 size_t, size_t, size_t, void *),
+	 int (*is_line_excess)(const struct linefold_info *,
+			       const linefold_char *,
+			       size_t, size_t, size_t, void *),
 	 void (*writeout_cb)(const struct linefold_info *,
 			     const linefold_char *,
 			     size_t, size_t, linefold_action, void *),
@@ -147,8 +147,8 @@ linefold(struct linefold_info *lbinfo, linefold_char *text,
   lbactions = lbinfo->lbactions;
   flags = lbinfo->flags;
 
-  if (is_line_exceeded == NULL)
-    is_line_exceeded = &linefold_is_line_exceeded;
+  if (is_line_excess == NULL)
+    is_line_excess = &linefold_is_line_excess;
 
   while (i < textlen) {
     prevaction = LINEFOLD_ACTION_PROHIBITED;
@@ -166,8 +166,8 @@ linefold(struct linefold_info *lbinfo, linefold_char *text,
 	       action == LINEFOLD_ACTION_DIRECT)
 	/* Ommited Direct break */
 	continue;
-      else if ((*is_line_exceeded)(lbinfo, text, linestart, i-linestart+1,
-				   maxlen, voidarg)) {
+      else if ((*is_line_excess)(lbinfo, text, linestart, i-linestart+1,
+				 maxlen, voidarg)) {
 	/* Line has exceeded the limit. Search previous line breaking
 	   oppotunity. */
 	if (prevaction != LINEFOLD_ACTION_PROHIBITED) {
@@ -181,8 +181,8 @@ linefold(struct linefold_info *lbinfo, linefold_char *text,
 	  while (i >= linestart) {
 	    i--;
 	    if (lbactions[i] != LINEFOLD_ACTION_COMBINING_PROHIBITED &&
-		!(*is_line_exceeded)(lbinfo, text, linestart, i-linestart+1,
-				     maxlen, voidarg))
+		!(*is_line_excess)(lbinfo, text, linestart, i-linestart+1,
+				   maxlen, voidarg))
 	      break;
 	  }
 	  action = LINEFOLD_ACTION_DIRECT;
@@ -407,6 +407,13 @@ linefold_tailor_lbprop(linefold_char c,
     else
       lbc = LINEFOLD_CLASS_IN;
 #endif
+#ifdef LINEFOLD_CLASS_NSEX
+  } else if (lbc == LINEFOLD_CLASS_NSEX) {
+    if (flags & LINEFOLD_OPTION_NSEX_IS_EX)
+      lbc = LINEFOLD_CLASS_EX;
+    else
+      lbc = LINEFOLD_CLASS_NS;
+#endif
   }
 
   *widthptr = width;
@@ -530,10 +537,10 @@ find_linebreak(size_t textlen,
 /* Internal default of function to check if length of a line exceeds
    limit. */
 int
-linefold_is_line_exceeded(const struct linefold_info *lbinfo,
-			  const linefold_char *text,
-			  size_t start, size_t len, size_t maxlen,
-			  void *voidarg)
+linefold_is_line_excess(const struct linefold_info *lbinfo,
+			const linefold_char *text,
+			size_t start, size_t len, size_t maxlen,
+			void *voidarg)
 {
   size_t end = start + len;
   const linefold_width *widths = lbinfo->widths;
@@ -543,7 +550,6 @@ linefold_is_line_exceeded(const struct linefold_info *lbinfo,
 
   for (i=start; i < end; i++) {
     linefold_class lbc = lbclasses[i];
-    //switch (lbclasses[i]) {
     if (lbc == LINEFOLD_CLASS_SP ||
 	lbc == LINEFOLD_CLASS_BK ||
 	lbc == LINEFOLD_CLASS_CR ||
@@ -571,7 +577,9 @@ linefold_is_line_exceeded(const struct linefold_info *lbinfo,
 	length += widths[i];
 
     } else if (lbc == LINEFOLD_CLASS_CLH ||
-	       lbc == LINEFOLD_CLASS_CLHSP) {
+	       lbc == LINEFOLD_CLASS_CLHSP ||
+	       (lbc == LINEFOLD_CLASS_IDSP &&
+		!(flags & LINEFOLD_OPTION_NOHUNG_IDSP))) {
       if (real_length > maxlen)
 	length = real_length + widths[i];
 

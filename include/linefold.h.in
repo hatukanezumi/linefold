@@ -19,6 +19,10 @@
 #ifndef LINEFOLD_H
 #define LINEFOLD_H
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 #define LINEFOLD_API_VERSION 0x0100
 
 @INCLUDE_WCHAR_H@
@@ -93,9 +97,9 @@ extern void
 linefold_tailor_lbprop(linefold_char, linefold_width *, linefold_class *,
 		       linefold_flags);
 extern int
-linefold_is_line_exceeded(const struct linefold_info *,
-			  const linefold_char *, size_t,
-			  size_t, size_t, void* voidarg);
+linefold_is_line_excess(const struct linefold_info *,
+			const linefold_char *, size_t,
+			size_t, size_t, void* voidarg);
 
 /*
  * Options to tailor line breaking behavior.
@@ -177,26 +181,32 @@ linefold_is_line_exceeded(const struct linefold_info *,
 #define LINEFOLD_OPTION_OPAL_IS_AL              (1<<13)
 
 /*
- * Set this to treat ellipsises as B2, not IN.
+ * Set this to treat ellipsises as B2 [JIS X 4051], not IN [UAX #14].
  */
 #define LINEFOLD_OPTION_INB2_IS_B2              (1<<14)
+
+/*
+ * Set this to treat compond exclamations as EX [JIS X 4051], not NS
+ * [UAX #14].
+ */
+#define LINEFOLD_OPTION_NSEX_IS_EX              (1<<15)
 
 /*
  * Set this option to ommit Direct break oppotunities.
  * WARNING: This may fold non-alphabetic (or mixed) texts *very* ugrily.
  */
-#define LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<15)
+#define LINEFOLD_OPTION_NOBREAK_DIRECT          (1<<16)
 
 /*
  * Set this option not to combine hangul combining jamos (JT, JV, JL)
  * when line lengths are determined.
  */
-#define LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<16)
+#define LINEFOLD_OPTION_NOCOMBINE_HANGUL_JAMO   (1<<17)
 
 /*
  * Set this to break SP+CM sequence. [UAX#14]
  */
-#define LINEFOLD_OPTION_BREAK_SPCM              (1<<17)
+#define LINEFOLD_OPTION_BREAK_SPCM              (1<<18)
 
 /* 
  * Set this option to force break unbreakable text longer than specified
@@ -204,7 +214,13 @@ linefold_is_line_exceeded(const struct linefold_info *,
  * This violate line breaking rules then may cause break within words,
  * syllables, characters or on somewhere unpreferred.
  */
-#define LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<18)
+#define LINEFOLD_OPTION_FORCE_LINEWIDTH         (1<<19)
+
+/*
+ * Set this option to disallow IDEOGRAPHIC SPACE hang out of right
+ * (bottom, in vertical line) margin.
+ */
+#define LINEFOLD_OPTION_NOHUNG_IDSP             (1<<20)
 
 #define LINEFOLD_OPTION_DEFAULT                 0
 
@@ -217,5 +233,10 @@ linefold_is_line_exceeded(const struct linefold_info *,
  *   (6 octets is very rare).
  */
 #define LINEFOLD_HARD_LIMIT                     199
+
+
+#ifdef  __cplusplus
+}
+#endif
 
 #endif /* LINEFOLD_H */

@@ -73,8 +73,13 @@ extern const linefold_class LINEFOLD_CLASS_NL;
 #define LINEFOLD_CLASS_BKFF 36
 #define LINEFOLD_CLASS_BKVT 37
 #define LINEFOLD_CLASS_INB2 38
-#define LINEFOLD_CLASS_NSK 39
-#define LINEFOLD_CLASS_OPAL 40
+#define LINEFOLD_CLASS_NSEX 39
+#define LINEFOLD_CLASS_NSK 40
+#define LINEFOLD_CLASS_OPAL 41
+
+/* User defined class. */
+
+extern const linefold_class LINEFOLD_CLASS_USERDEFINED;
 
 extern void linefold_getprop_generic(linefold_char,
                                      linefold_width *, linefold_class *);

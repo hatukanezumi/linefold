@@ -56,50 +56,56 @@ def customize(propmap):
             propmap[k] = (2, v[1])
         
     # Compatibilities between UAX#14 and JIS X 4051.
-    # - EM DASH is classified B2 by UAX and ``分離禁止文字'' (inseparable
-    #   characters) by JIS.  So vertical form also may be B2 [1.0beta2].
-    # - TWO DOT LEADER and HORIZONTAL ELLIPSIS are classified IN by UAX
-    #   but ``inseparable characters'' by JIS. So they and their vertical
-    #   forms might be B2 (tailorable) [1.0beta2].
-    # - EN DASH is BA by UAX and ``ハイフン類'' (hyphen class) by JIS, so
-    #   vertical form is also BA.
-    # - Compound exclamations/questions are classified ``区切り約物''
-    #   (separating symbols) by JIS, acompany with single exclamation /
-    #   question signs.
-    # - NUMBER SIGN is classified ``前置省略記号'' (prefixing
-    #   abbreviations) by JIS, so only narrow form might be PR.  Its
+    # - EM DASH is classified as B2 by UAX and class (8) 分離禁止文字
+    #   (inseparable characters; characters of this class by JIS allow
+    #   break after AL, ID etc.) by JIS.  So vertical form also may be
+    #   B2.
+    # - TWO DOT LEADER and HORIZONTAL ELLIPSIS are classified as IN by
+    #   UAX but class (8) 分離禁止文字 by JIS.  So they and their
+    #   vertical forms might be B2 (tailorable).
+    # - EN DASH is BA by UAX and class (4) ハイフン類 (hyphen class)
+    #   by JIS.  So vertical form of it is also BA.
+    # - Compound exclamations/questions are classified as class (5) 区
+    #   切り約物 (separating symbols) by JIS, acompany with single
+    #   exclamation / question marks.  So they might be EX
+    #   (tailorable).
+    #   N.B.: JIS doesn't assign INTERROBANG to this class because it
+    #   isn't assigned to JIS X 0213.
+    # - NUMBER SIGN is classified as class (9) 前置省略記号 (prefixing
+    #   abbreviations) by JIS.  So only narrow form might be PR.  Its
     #   fullwidth counterpart is remained to be ID.
-    # - Some characters are classified as ``単位記号中の文字'' (characters
-    #   in physical units) by JIS.
+    # - Some characters are classified as class (19) 単位記号中の文字 
+    #   (characters in physical units) by JIS.  So these characters
+    #   may be classified as PO.
+    #   N.B.: JIS assigns GREEK CAPITAL LETTER OMEGA and GREEK SMALL
+    #   LETTER MU to this class, instead of OHM SIGN and MICRO SIGN.
+    #   Because latters aren't assigned to JIS X 0213.
     # About these customizations viewed from JIS side, see
     # http://hatuka.nezumi.nu/log/2006/05/uax14_vs_jisx4051.html
     propmap.update( {
+        0x0023: (1, 'PR'), # NUMBER SIGN
+        0x00B5: (1, 'PO'), # MICRO SIGN (not in JIS: see note above)
         0x2025: (1, 'INB2'), # TWO DOT LEADER
         0x2026: (1, 'INB2'), # HORIZONTAL ELLIPSIS
-        0x203C: (1, 'EX'), # DOUBLE EXCLAMATION MARK
-        0x203D: (1, 'EX'), # INTERROBANG
-        0x2047: (1, 'EX'), # DOUBLE QUESTION MARK
-        0x2048: (1, 'EX'), # QUESTION EXCLAMATION MARK
-        0x2049: (1, 'EX'), # EXCLAMATION QUESTION MARK
-        0xFE19: (2, 'INB2'), # PRESENTATION FORM FOR VERTICAL HORIZONTAL ELLIPSIS
-        0xFE32: (2, 'BA'), # PRESENTATION FORM FOR VERTICAL EN DASH
-        0xFE31: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL EM DASH
-        0xFE30: (2, 'INB2'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
-        0x3033: (2, 'IN'), # VERTICAL KANA REPEAT MARK UPPER HALF
-        0x3034: (2, 'IN'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
-        0x3035: (2, 'IN'), # VERTICAL KANA REPEAT MARK LOWER HALF
-        0x0023: (1, 'PR'), # NUMBER SIGN
-        0x00B5: (1, 'PO'), # MICRO SIGN
+        0x203C: (1, 'NSEX'), # DOUBLE EXCLAMATION MARK
+        0x203D: (1, 'NSEX'), # INTERROBANG (not in JIS: see note above)
+        0x2047: (1, 'NSEX'), # DOUBLE QUESTION MARK
+        0x2048: (1, 'NSEX'), # QUESTION EXCLAMATION MARK
+        0x2049: (1, 'NSEX'), # EXCLAMATION QUESTION MARK
         0x2113: (1, 'PO'), # SCRIPT SMALL L [liter]
-        0x2126: (1, 'PO'), # OHM SIGN
+        0x2126: (1, 'PO'), # OHM SIGN (not in JIS: see note above)
         0x2127: (1, 'PO'), # INVERTED OHM SIGN [mho]
         0x212B: (1, 'PO'), # ANGSTROM SIGN
         0x33CB: (2, 'PO'), # SQUARE HP [horse power]
+        0xFE19: (2, 'INB2'), # PRESENTATION FORM FOR VERTICAL HORIZONTAL ELLIPSIS
+        0xFE30: (2, 'INB2'), # PRESENTATION FORM FOR VERTICAL TWO DOT LEADER
+        0xFE31: (2, 'B2'), # PRESENTATION FORM FOR VERTICAL EM DASH
+        0xFE32: (2, 'BA'), # PRESENTATION FORM FOR VERTICAL EN DASH
         } )
 
-    # Hiragana/katakana small letters and prolonged sign are treated as NS.
-    # they may be treated as ID (this behavior may be tailored.
-    # cf. JIS X 4051:2004, section 6.1.1).
+    # Hiragana/katakana small letters and prolonged sign are treated
+    # as NS.  They may be treated as ID (this behavior may be
+    # tailored.  cf. JIS X 4051:2004, section 6.1.1).
     # Halfwidth form of katakana small letters and prolonged sign are
     # treated as AL, since other halfwidth katakana are AL.
     propmap.update( {
@@ -161,12 +167,12 @@ def customize(propmap):
         } )
 
     # In traditional East Asian line folding, comma and full stop can
-    # be protrude into the right margin (``ぶら下げ''; hunging
-    # punctuation) so that ``widow characters'' are reduced or simply
-    # aesthetism is satisfied.  We apply this custom to Ideographic
-    # and Fullwidth Latin ones (this behavior may be tailored).  To
-    # support these features, extended line breaking classes are
-    # introduced (about CLHSP see also below).
+    # be protrude into the right -- bottom, in vertical line -- margin
+    # (``ぶら下げ''; hunging punctuation) so that ``widow characters''
+    # are reduced or simply aesthetism is satisfied.  We apply this
+    # custom to Ideographic and Fullwidth Latin ones (this behavior
+    # may be tailored).  To support these features, extended line
+    # breaking classes are introduced (about CLHSP see also below).
     propmap.update( {
         0x3001: (2, 'CLHSP'), # IDEOGRAPHIC COMMA
         0x3002: (2, 'CLHSP'), # IDEOGRAPHIC FULL STOP
@@ -178,11 +184,11 @@ def customize(propmap):
         0xFF64: (1, 'CLH'), # HALFWIDTH IDEOGRAPHIC COMMA
         } )
 
-    # In East Asian custom, Wide punctuations are often treated as a
-    # Narrow character preceeded/followed by one SP (glue).  So, they
-    # allow Direct Break where either Direct or Indirect break is
-    # possible.  And so, Wide CL characters allow ``half''-hunging at end
-    # of line.
+    # In East Asian text handling, Wide punctuations are often treated
+    # as a Narrow character preceeded/followed by one SP (glue).  So,
+    # they allow Direct Break where either Direct or Indirect break is
+    # possible.  And so, Wide CL characters allow ``half''-hunging at
+    # end of line.
     for k, v in propmap.items():
         if v[0] == 2:
             if v[1] == 'OP':
@@ -191,22 +197,31 @@ def customize(propmap):
                 propmap[k] = (v[0], 'CLSP')
 
     # Usually IDEOGRAPHIC SPACE behaves as ID.  But in japanese
-    # typsetting custom, exclamation/question marks are followed by a
-    # space with width of one character (i.e. Wide space); IDEOGRAPHIC
-    # SPACE is often used.  So don't break between EX and IDEOGRAPHIC
-    # SPACE.  IDEOGRAPHIC SPACE is also often used to justify text
-    # alignment.  So sequence of multiple IDEOGRAPHIC SPACEs won't be
-    # broken.
+    # typsetting custom, exclamation/question marks at end of sentence
+    # are followed by a space with width of one character (i.e. Wide
+    # space); IDEOGRAPHIC SPACE is often used.  So don't break between
+    # EX and IDEOGRAPHIC SPACE.  IDEOGRAPHIC SPACE is also often used
+    # to justify text alignment.  So sequence of multiple IDEOGRAPHIC
+    # SPACEs won't be broken.  Also, IDEOGRAPHIC SPACE can be protrude
+    # into right (bottom) margin.
     propmap.update( {
         0x3000: (2, 'IDSP'), # IDEOGRAPHIC SPACE
+        } )
+
+    # Paired vertical kana repeat marks shouldn't be separable.  As a
+    # workaround, assign them to B2.
+    propmap.update( {
+        0x3033: (2, 'B2'), # VERTICAL KANA REPEAT MARK UPPER HALF
+        0x3034: (2, 'B2'), # VERTICAL KANA REPEAT WITH VOICED SOUND MARK UPPER HALF
+        0x3035: (2, 'B2'), # VERTICAL KANA REPEAT MARK LOWER HALF
         } )
 
 
     ## Complex Line Breaking behavior on some South East Asian scripts
     ## (Thai, Lao, Myanmar, Khmer, Tai Le, New Tai Lue).
 
-    # These characters are classified SA by UAX#14.  Word separator won't
-    # be used.  For workaround, assign classes as below:
+    # These characters are classified as SA by UAX#14.  Word separator
+    # won't be used.  For workaround, assign classes as below:
     # o Vowels preceding consonant (in Thai and Lao):   BB.
     # o Semi-vowel consonant (in Thai and Lao):         CM with extra width.
     # o Subscript/superscript (semi-)vowels/consonants: CM.
@@ -216,12 +231,12 @@ def customize(propmap):
     # o Other letters:                                  ID.
     # This will avoid breaking within V-C(-T) and C-V(-T)(-subC) sequences.
     #
-    # Note: This workaround is exactly insufficient.  Line breaks may occur
-    #   within compound consonants, before closing consonants, etc.  To
-    #   acomplish sufficient line breaking feature, morphologic analysises
-    #   are required (about Thai implementation of such analysis see
-    #   ``การตัดคำ'' (Word Cut Task), by สัตยมาศ, available at
-    #   http://thaiwordseg.sourceforge.net/).
+    # Note: This workaround is exactly insufficient.  Line breaks may
+    #   occur within compound consonants, before closing consonants,
+    #   etc.  To acomplish sufficient line breaking feature,
+    #   morphologic analysises are required (about Thai implementation
+    #   of such analysis see for example ``การตัดคำ'' (Word Cut Task) by
+    #   สัตยมาศ, available at http://thaiwordseg.sourceforge.net/).
 
     propmap.update( {
         ## Thai
