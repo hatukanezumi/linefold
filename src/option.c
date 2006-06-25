@@ -116,6 +116,17 @@ struct option_table options[] = {
     "hangul syllable (if possible)."
   },
   {
+    '-', "compound exclamation is EX", "yes|no",
+    0, LINEFOLD_OPTION_NSEX_IS_EX,0,0,0,0,0,
+    "Treat following characters as EX (exclamation / interrogation),\n"
+    "not NS (non starter):\n"
+    "U+203C DOUBLE EXCLAMATION MARK\n"
+    "U+203D INTERROBANG\n"
+    "U+2047 DOUBLE QUESTION MARK\n"
+    "U+2048 QUESTION EXCLAMATION MARK\n"
+    "U+2049 EXCLAMATION QUESTION MARK\n"
+  }, 
+  {
     'c', "context code", "encoding",
     0, 0,0,0,&option_context_code,0,0,
     "Context character set to determine character width properties.\n"
