@@ -245,12 +245,15 @@ linefold_find_lbprop_func(const char *chset, linefold_flags flags)
 {
   if (chset == NULL || flags & LINEFOLD_OPTION_GENERIC_WIDTH)
     return &linefold_getprop_generic;
-  else if (charsetcmp(chset, "BIG5")==0 ||
+  else if (charsetcmp(chset, "CNS")==0 || /* not a charset name. */
+	   charsetcmp(chset, "BIG5")==0 ||
+	   charsetcmp(chset, "BIG5-ETEN")==0 ||
 	   charsetcmp(chset, "BIG5-HKSCS")==0 ||
 	   charsetcmp(chset, "EUC-TW")==0 ||
 	   charsetcmp(chset, "CP950")==0)
     return &linefold_getprop_C;
-  else if (charsetcmp(chset, "EUC-CN")==0 ||
+  else if (charsetcmp(chset, "GB")==0 || /* not a charset name */
+	   charsetcmp(chset, "EUC-CN")==0 ||
 	   charsetcmp(chset, "ISO-2022-CN")==0 ||
 	   charsetcmp(chset, "ISO-2022-CN-EXT")==0 ||
 	   charsetcmp(chset, "HZ")==0 ||
@@ -260,7 +263,8 @@ linefold_find_lbprop_func(const char *chset, linefold_flags flags)
 	   charsetcmp(chset, "GB18030")==0 ||
 	   charsetcmp(chset, "CP936")==0)
     return &linefold_getprop_G;
-  else if (charsetcmp(chset, "ISO-2022-JP")==0 ||
+  else if (charsetcmp(chset, "JIS")==0 || /* not a charset name */
+	   charsetcmp(chset, "ISO-2022-JP")==0 ||
 	   charsetcmp(chset, "ISO-2022-JP-1")==0 ||
 	   charsetcmp(chset, "ISO-2022-JP-2")==0 ||
 	   charsetcmp(chset, "ISO-2022-JP-3")==0 ||
@@ -277,9 +281,12 @@ linefold_find_lbprop_func(const char *chset, linefold_flags flags)
 	   charsetcmp(chset, "SHIFT_JISX0213-PLANE1")==0 ||
 	   charsetcmp(chset, "SHIFT_JIS-2004")==0 ||
 	   charsetcmp(chset, "SHIFT_JIS-2004-PLANE1")==0 ||
-	   charsetcmp(chset, "CP932")==0)
+	   charsetcmp(chset, "CP932")==0 ||
+	   charsetcmp(chset, "CP942")==0 || /* IBM */
+	   charsetcmp(chset, "CP943")==0) /* IBM */
     return &linefold_getprop_J;
-  else if (charsetcmp(chset, "ISO-2022-KR")==0 ||
+  else if (charsetcmp(chset, "KS")==0 || /* not a charset name */
+	   charsetcmp(chset, "ISO-2022-KR")==0 ||
 	   charsetcmp(chset, "EUC-KR")==0 ||
 	   charsetcmp(chset, "CP949")==0 ||
 	   charsetcmp(chset, "UHC")==0 ||
