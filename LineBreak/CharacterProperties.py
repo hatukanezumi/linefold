@@ -20,8 +20,8 @@ $Id$
 """
 
 def customize(propmap):
-    ## Revisions between rev. 17 (data version 4.1.0) and 18 (data version
-    ## 5.0.0d7) of UAX#14.  Note: Only modifications of classification
+    ## Revisions between rev. 17 (data version 4.1.0) and 19 (data version
+    ## 5.0.0) of UAX#14.  Note: Only modifications of classification
     ## are followed.  Added characters are not followed.
 
     propmap.update( {
@@ -167,7 +167,7 @@ def customize(propmap):
         } )
 
     # In traditional East Asian line folding, comma and full stop can
-    # be protrude into the right -- bottom, in vertical line -- margin
+    # be protruded into the right -- bottom, in vertical line -- margin
     # (``ぶら下げ''; hunging punctuation) so that ``widow characters''
     # are reduced or simply aesthetism is satisfied.  We apply this
     # custom to Ideographic and Fullwidth Latin ones (this behavior
@@ -202,7 +202,7 @@ def customize(propmap):
     # space); IDEOGRAPHIC SPACE is often used.  So don't break between
     # EX and IDEOGRAPHIC SPACE.  IDEOGRAPHIC SPACE is also often used
     # to justify text alignment.  So sequence of multiple IDEOGRAPHIC
-    # SPACEs won't be broken.  Also, IDEOGRAPHIC SPACE can be protrude
+    # SPACEs won't be broken.  Also, IDEOGRAPHIC SPACE can be protruded
     # into right (bottom) margin.
     propmap.update( {
         0x3000: (2, 'IDSP'), # IDEOGRAPHIC SPACE

@@ -56,7 +56,7 @@ COMBINING_PROHIBITED = '@'
 
 
 ###
-### List of rules by UAX#14 rev. 18.
+### List of rules by UAX#14 rev. 19 (Unicode 5.0.0).
 ###
 
 LINE_BREAKING_RULES = [

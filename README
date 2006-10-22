@@ -507,7 +507,7 @@ LINEFOLD_CLASS_IDSP:  Ideographic Space
     SPACE is often used.  So don't break between EX and IDEOGRAPHIC
     SPACE.  IDEOGRAPHIC SPACE is also often used to justify text
     alignment.  So sequence of multiple IDEOGRAPHIC SPACEs won't be
-    broken.  Also, IDEOGRAPHIC SPACE can be protrude into right
+    broken.  Also, IDEOGRAPHIC SPACE can be protruded into right
     (bottom) margin.
 
 LINEFOLD_CLASS_SPOP:  Opening Punctuation Preceded by Virtual Space
@@ -516,7 +516,7 @@ LINEFOLD_CLASS_CLSP:  Closing Punctuation Followed by Virtual Space
 LINEFOLD_CLASS_CLHSP: Closing Punctuation Allow Hunging and Followed by
                       Virtual Space
     In traditional East Asian line folding, comma and full stop can
-    be protrude into the right -- bottom, in vertical line -- margin
+    be protruded into the right -- bottom, in vertical line -- margin
     (``ぶら下げ'' [burasage]; hunging punctuation) so that ``widow
     characters'' are reduced or simply aesthetism is satisfied.
     Also, Wide punctuations are often treated as a Narrow character
