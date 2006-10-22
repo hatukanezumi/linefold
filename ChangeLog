@@ -1,6 +1,6 @@
 2006-10-22  Hatuka*nezumi  <hatuka@nezumi.nu>
 
-	* 1.0beta1.
+	* 1.0beta2.
 	* Update property tables by the data of Unicode 5.0.0.
 	* lib/linefold.c: Added context charset names.
 	* Fix typos.
